@@ -59,6 +59,9 @@
                                         </constraints>
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="filled" image="view.3d" catalog="system"/>
+                                        <connections>
+                                            <action selector="onDimensionClick:" destination="vNz-Qc-MdM" eventType="touchUpInside" id="hml-WO-OUi"/>
+                                        </connections>
                                     </button>
                                 </subviews>
                             </stackView>

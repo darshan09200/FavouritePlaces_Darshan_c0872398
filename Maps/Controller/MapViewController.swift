@@ -62,6 +62,21 @@ class MapViewController: UIViewController {
 		zoomMap(byFactor: 4)
 	}
 	
+	@IBAction func onDimensionClick(_ sender: UIButton) {
+		let camera = self.mapView.camera
+		let mapCamera = MKMapCamera()
+		mapCamera.centerCoordinate = camera.centerCoordinate
+		mapCamera.centerCoordinateDistance = camera.centerCoordinateDistance
+		if camera.pitch > 0 {
+			sender.setImage(UIImage(systemName: "view.3d"), for: .normal)
+			mapCamera.pitch = 0
+		} else {
+			sender.setImage(UIImage(systemName: "view.2d"), for: .normal)
+			mapCamera.pitch = 70
+		}
+		self.mapView.setCamera(mapCamera, animated: true)
+	}
+	
 }
 
 extension MapViewController: MKMapViewDelegate{
