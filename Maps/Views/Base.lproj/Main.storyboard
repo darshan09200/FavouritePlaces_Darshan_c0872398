@@ -74,6 +74,9 @@
                                         <buttonConfiguration key="configuration" style="filled" imagePadding="4">
                                             <imageReference key="image" image="plus" catalog="system" symbolScale="small"/>
                                         </buttonConfiguration>
+                                        <connections>
+                                            <action selector="onZoomInPress" destination="vNz-Qc-MdM" eventType="touchUpInside" id="7WM-dF-1wn"/>
+                                        </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2eb-eH-JZR">
                                         <rect key="frame" x="0.0" y="46.333333333333258" width="38.333333333333336" height="38.333333333333343"/>
@@ -84,6 +87,9 @@
                                         <buttonConfiguration key="configuration" style="filled">
                                             <imageReference key="image" image="minus" catalog="system" symbolScale="small"/>
                                         </buttonConfiguration>
+                                        <connections>
+                                            <action selector="onZoomOutPress" destination="vNz-Qc-MdM" eventType="touchUpInside" id="HQ5-Yu-2f2"/>
+                                        </connections>
                                     </button>
                                 </subviews>
                             </stackView>

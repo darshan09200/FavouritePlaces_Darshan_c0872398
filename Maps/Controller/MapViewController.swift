@@ -54,6 +54,14 @@ class MapViewController: UIViewController {
 		
 	}
 	
+	@IBAction func onZoomInPress() {
+		zoomMap(byFactor: 0.25)
+	}
+	
+	@IBAction func onZoomOutPress() {
+		zoomMap(byFactor: 4)
+	}
+	
 }
 
 extension MapViewController: MKMapViewDelegate{
