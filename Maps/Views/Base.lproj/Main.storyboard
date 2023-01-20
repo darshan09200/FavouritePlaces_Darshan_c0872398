@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="21507" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="gEO-F3-T6y">
+    <device id="retina6_12" orientation="portrait" appearance="light"/>
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="21505"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
+        <capability name="Map view configurations" minToolsVersion="14.0"/>
+        <capability name="Safe area layout guides" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <scenes>
+        <!--Navigation Controller-->
+        <scene sceneID="ldW-pr-cvO">
+            <objects>
+                <navigationController id="gEO-F3-T6y" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="m5K-so-EWm">
+                        <rect key="frame" x="0.0" y="59" width="393" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="vNz-Qc-MdM" kind="relationship" relationship="rootViewController" id="pPt-Kl-oGA"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="fgO-dU-lqX" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-955" y="-120"/>
+        </scene>
+        <!--View Controller-->
+        <scene sceneID="gf0-YG-UaS">
+            <objects>
+                <viewController id="vNz-Qc-MdM" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="jbA-qM-aD4">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <mapView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsUserLocation="YES" showsScale="YES" translatesAutoresizingMaskIntoConstraints="NO" id="ZPB-Q6-WV4">
+                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                                <standardMapConfiguration key="preferredConfiguration" showsTraffic="YES"/>
+                            </mapView>
+                            <stackView opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="YId-Tp-Ghd">
+                                <rect key="frame" x="322.33333333333331" y="119" width="54.666666666666686" height="117.33333333333331"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QQp-vp-fyc">
+                                        <rect key="frame" x="0.0" y="0.0" width="54.666666666666664" height="54.666666666666664"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="QQp-vp-fyc" secondAttribute="height" multiplier="1:1" id="koh-BK-LoH"/>
+                                        </constraints>
+                                        <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                        <state key="normal" image="map.fill" catalog="system"/>
+                                        <buttonConfiguration key="configuration" style="filled" image="map.fill" catalog="system">
+                                            <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        </buttonConfiguration>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZaV-Kd-N3d">
+                                        <rect key="frame" x="0.0" y="62.666666666666657" width="54.666666666666664" height="54.666666666666657"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="ZaV-Kd-N3d" secondAttribute="height" multiplier="1:1" id="Bta-H1-jUq"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="filled" image="view.3d" catalog="system"/>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                            <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="elO-a8-bce">
+                                <rect key="frame" x="338.66666666666669" y="717.33333333333337" width="38.333333333333314" height="84.666666666666629"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" adjustsImageSizeForAccessibilityContentSizeCategory="YES" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="XmA-25-RTl">
+                                        <rect key="frame" x="0.0" y="0.0" width="38.333333333333336" height="38.333333333333336"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="XmA-25-RTl" secondAttribute="height" multiplier="1:1" id="Fht-3q-S0n"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="filled" imagePadding="4">
+                                            <imageReference key="image" image="plus" catalog="system" symbolScale="small"/>
+                                        </buttonConfiguration>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="2eb-eH-JZR">
+                                        <rect key="frame" x="0.0" y="46.333333333333258" width="38.333333333333336" height="38.333333333333343"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="2eb-eH-JZR" secondAttribute="height" multiplier="1:1" id="iom-od-Z3Z"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="filled">
+                                            <imageReference key="image" image="minus" catalog="system" symbolScale="small"/>
+                                        </buttonConfiguration>
+                                    </button>
+                                </subviews>
+                            </stackView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="S7N-hP-iXm"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="S7N-hP-iXm" firstAttribute="trailing" secondItem="elO-a8-bce" secondAttribute="trailing" constant="16" id="4JH-Vf-cjh"/>
+                            <constraint firstItem="ZPB-Q6-WV4" firstAttribute="leading" secondItem="S7N-hP-iXm" secondAttribute="leading" id="HeO-BW-XAi"/>
+                            <constraint firstItem="S7N-hP-iXm" firstAttribute="trailing" secondItem="ZPB-Q6-WV4" secondAttribute="trailing" id="IwT-4E-BbR"/>
+                            <constraint firstItem="S7N-hP-iXm" firstAttribute="trailing" secondItem="YId-Tp-Ghd" secondAttribute="trailing" constant="16" id="ODd-F7-bU9"/>
+                            <constraint firstAttribute="bottom" secondItem="ZPB-Q6-WV4" secondAttribute="bottom" id="P6q-zF-d6H"/>
+                            <constraint firstItem="S7N-hP-iXm" firstAttribute="bottom" secondItem="elO-a8-bce" secondAttribute="bottom" constant="16" id="ego-7J-d5J"/>
+                            <constraint firstItem="ZPB-Q6-WV4" firstAttribute="top" secondItem="jbA-qM-aD4" secondAttribute="top" id="iSM-M8-itL"/>
+                            <constraint firstItem="YId-Tp-Ghd" firstAttribute="top" secondItem="S7N-hP-iXm" secondAttribute="top" constant="16" id="tN3-rx-22v"/>
+                        </constraints>
+                    </view>
+                    <navigationItem key="navigationItem" id="hgQ-CT-r7R"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="6My-4G-vw2" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-80" y="-120"/>
+        </scene>
+    </scenes>
+    <resources>
+        <image name="map.fill" catalog="system" width="128" height="110"/>
+        <image name="minus" catalog="system" width="128" height="26"/>
+        <image name="plus" catalog="system" width="128" height="113"/>
+        <image name="view.3d" catalog="system" width="128" height="76"/>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
+</document>

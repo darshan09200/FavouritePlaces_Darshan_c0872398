@@ -56,15 +56,31 @@
 		557FDD1F297B5B4300191FE7 /* Maps */ = {
 			isa = PBXGroup;
 			children = (
+				557FDD35297B5C1C00191FE7 /* Controller */,
+				557FDD34297B5B8100191FE7 /* Views */,
 				557FDD20297B5B4300191FE7 /* AppDelegate.swift */,
 				557FDD22297B5B4300191FE7 /* SceneDelegate.swift */,
-				557FDD24297B5B4300191FE7 /* ViewController.swift */,
-				557FDD26297B5B4300191FE7 /* Main.storyboard */,
 				557FDD29297B5B4400191FE7 /* Assets.xcassets */,
-				557FDD2B297B5B4400191FE7 /* LaunchScreen.storyboard */,
 				557FDD2E297B5B4400191FE7 /* Info.plist */,
 			);
 			path = Maps;
+			sourceTree = "<group>";
+		};
+		557FDD34297B5B8100191FE7 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				557FDD26297B5B4300191FE7 /* Main.storyboard */,
+				557FDD2B297B5B4400191FE7 /* LaunchScreen.storyboard */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		557FDD35297B5C1C00191FE7 /* Controller */ = {
+			isa = PBXGroup;
+			children = (
+				557FDD24297B5B4300191FE7 /* ViewController.swift */,
+			);
+			path = Controller;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
