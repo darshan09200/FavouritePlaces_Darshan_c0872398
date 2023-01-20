@@ -26,10 +26,10 @@
             </objects>
             <point key="canvasLocation" x="-955" y="-120"/>
         </scene>
-        <!--View Controller-->
+        <!--Map View Controller-->
         <scene sceneID="gf0-YG-UaS">
             <objects>
-                <viewController id="vNz-Qc-MdM" sceneMemberID="viewController">
+                <viewController id="vNz-Qc-MdM" customClass="MapViewController" customModule="Maps" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="jbA-qM-aD4">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -102,6 +102,14 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="hgQ-CT-r7R"/>
+                    <connections>
+                        <outlet property="mapConfigStackView" destination="YId-Tp-Ghd" id="y1e-xW-sxz"/>
+                        <outlet property="mapView" destination="ZPB-Q6-WV4" id="jcG-dH-Y0r"/>
+                        <outlet property="zoomInBtn" destination="XmA-25-RTl" id="m4r-9g-YdE"/>
+                        <outlet property="zoomOutBtn" destination="2eb-eH-JZR" id="bqO-b1-LdH"/>
+                        <outlet property="zoomStackBottomConstraint" destination="ego-7J-d5J" id="K50-dL-KnW"/>
+                        <outlet property="zoomStackView" destination="elO-a8-bce" id="5mK-tb-Igb"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="6My-4G-vw2" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
