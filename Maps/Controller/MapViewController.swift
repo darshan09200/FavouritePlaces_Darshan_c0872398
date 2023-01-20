@@ -54,12 +54,22 @@ class MapViewController: UIViewController {
 		
 	}
 	
-	@IBAction func onZoomInPress() {
-		zoomMap(byFactor: 0.25)
-	}
-	
-	@IBAction func onZoomOutPress() {
-		zoomMap(byFactor: 4)
+	@IBAction func onMapConfigPress(_ sender: Any) {
+		let alert = UIAlertController()
+		
+		alert.addAction(UIAlertAction(title: "Explore", style: .default , handler:{ (UIAlertAction)in
+			self.mapView.mapType = .standard
+		}))
+		
+		alert.addAction(UIAlertAction(title: "Satellite", style: .default , handler:{ (UIAlertAction)in
+			self.mapView.mapType = .satelliteFlyover
+		}))
+		
+		alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
+		
+		self.present(alert, animated: true, completion: {
+			print("completion block")
+		})
 	}
 	
 	@IBAction func onDimensionClick(_ sender: UIButton) {
@@ -75,6 +85,14 @@ class MapViewController: UIViewController {
 			mapCamera.pitch = 70
 		}
 		self.mapView.setCamera(mapCamera, animated: true)
+	}
+	
+	@IBAction func onZoomInPress() {
+		zoomMap(byFactor: 0.25)
+	}
+	
+	@IBAction func onZoomOutPress() {
+		zoomMap(byFactor: 4)
 	}
 	
 }

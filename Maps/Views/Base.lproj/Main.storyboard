@@ -51,6 +51,9 @@
                                         <buttonConfiguration key="configuration" style="filled" image="map.fill" catalog="system">
                                             <color key="baseForegroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         </buttonConfiguration>
+                                        <connections>
+                                            <action selector="onMapConfigPress:" destination="vNz-Qc-MdM" eventType="touchUpInside" id="rr2-eO-NEw"/>
+                                        </connections>
                                     </button>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="ZaV-Kd-N3d">
                                         <rect key="frame" x="0.0" y="62.666666666666657" width="54.666666666666664" height="54.666666666666657"/>
@@ -60,7 +63,7 @@
                                         <state key="normal" title="Button"/>
                                         <buttonConfiguration key="configuration" style="filled" image="view.3d" catalog="system"/>
                                         <connections>
-                                            <action selector="onDimensionClick:" destination="vNz-Qc-MdM" eventType="touchUpInside" id="hml-WO-OUi"/>
+                                            <action selector="onDimensionClick:" destination="vNz-Qc-MdM" eventType="touchUpInside" id="8DK-rB-EqC"/>
                                         </connections>
                                     </button>
                                 </subviews>
