@@ -7,6 +7,7 @@
 
 import UIKit
 import MapKit
+import CoreLocation
 
 class MapRoute {
 	private(set) var source: CLLocationCoordinate2D
@@ -49,8 +50,11 @@ class MapRoute {
 extension CLPlacemark {
 	
 	func getAddress() -> String {
-		return [subThoroughfare, thoroughfare, locality, administrativeArea, postalCode, country]
-			.compactMap({ $0 })
-			.joined(separator: " ")
+		return [[subThoroughfare, thoroughfare], [locality, administrativeArea, postalCode], [country]]
+			.map { (subComponents) -> String in
+				subComponents.compactMap({ $0 }).joined(separator: " ")
+			}
+			.filter({ return !$0.isEmpty && $0 != name })
+			.joined(separator: ", ")
 	}
 }

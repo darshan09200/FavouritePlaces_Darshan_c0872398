@@ -22,6 +22,8 @@
 		557FDD40297B6E2800191FE7 /* MapRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FDD3F297B6E2800191FE7 /* MapRoute.swift */; };
 		557FDD42297B83C600191FE7 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FDD41297B83C600191FE7 /* SearchViewController.swift */; };
 		557FDD44297B857D00191FE7 /* MapData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FDD43297B857D00191FE7 /* MapData.swift */; };
+		55A04E83297C3D8F00DD048C /* MapData.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 55A04E81297C3D8F00DD048C /* MapData.xcdatamodeld */; };
+		55A04E85297C4AAD00DD048C /* Pin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55A04E84297C4AAD00DD048C /* Pin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -42,6 +44,8 @@
 		557FDD3F297B6E2800191FE7 /* MapRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapRoute.swift; sourceTree = "<group>"; };
 		557FDD41297B83C600191FE7 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
 		557FDD43297B857D00191FE7 /* MapData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapData.swift; sourceTree = "<group>"; };
+		55A04E82297C3D8F00DD048C /* SearchHistory.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = SearchHistory.xcdatamodel; sourceTree = "<group>"; };
+		55A04E84297C4AAD00DD048C /* Pin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -74,6 +78,7 @@
 		557FDD1F297B5B4300191FE7 /* Maps */ = {
 			isa = PBXGroup;
 			children = (
+				55A04E80297C3D7200DD048C /* Data */,
 				557FDD3E297B6E0900191FE7 /* Model */,
 				557FDD35297B5C1C00191FE7 /* Controller */,
 				557FDD34297B5B8100191FE7 /* Views */,
@@ -114,8 +119,17 @@
 				557FDD3F297B6E2800191FE7 /* MapRoute.swift */,
 				557FDD43297B857D00191FE7 /* MapData.swift */,
 				5524CE46297BD1CA007B200E /* Step.swift */,
+				55A04E84297C4AAD00DD048C /* Pin.swift */,
 			);
 			path = Model;
+			sourceTree = "<group>";
+		};
+		55A04E80297C3D7200DD048C /* Data */ = {
+			isa = PBXGroup;
+			children = (
+				55A04E81297C3D8F00DD048C /* MapData.xcdatamodeld */,
+			);
+			path = Data;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -196,9 +210,11 @@
 				557FDD42297B83C600191FE7 /* SearchViewController.swift in Sources */,
 				5524CE47297BD1CA007B200E /* Step.swift in Sources */,
 				557FDD25297B5B4300191FE7 /* MapViewController.swift in Sources */,
+				55A04E85297C4AAD00DD048C /* Pin.swift in Sources */,
 				5524CE43297BB01C007B200E /* StepsTableViewCell.swift in Sources */,
 				557FDD21297B5B4300191FE7 /* AppDelegate.swift in Sources */,
 				557FDD3D297B6C4300191FE7 /* Annotation.swift in Sources */,
+				55A04E83297C3D8F00DD048C /* MapData.xcdatamodeld in Sources */,
 				557FDD40297B6E2800191FE7 /* MapRoute.swift in Sources */,
 				557FDD23297B5B4300191FE7 /* SceneDelegate.swift in Sources */,
 			);
@@ -418,6 +434,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		55A04E81297C3D8F00DD048C /* MapData.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				55A04E82297C3D8F00DD048C /* SearchHistory.xcdatamodel */,
+			);
+			currentVersion = 55A04E82297C3D8F00DD048C /* SearchHistory.xcdatamodel */;
+			path = MapData.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 557FDD15297B5B4300191FE7 /* Project object */;
 }

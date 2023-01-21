@@ -140,7 +140,11 @@ class MapViewController: UIViewController {
 			let coordinate = mapView.convert(point, toCoordinateFrom: mapView)
 			
 			MapHelper.getInstance().getAddress(of: coordinate){ placemark in
-				self.dropPin(at: coordinate, title: placemark?.name ?? self.generateAnnotationTitle())
+				let title = placemark?.name ?? self.generateAnnotationTitle()
+				self.dropPin(at: placemark?.location?.coordinate ?? coordinate, title: title)
+
+				MapData.getInstance().addToHistory(Pin(title: title, subtitle: placemark?.getAddress() ?? ""))
+				self.searchVC.searchResultsTable.reloadData()
 			}
 		}
 	}
@@ -483,8 +487,11 @@ extension MapViewController: SearchViewDelegate{
 	
 	func dropPin(at place: MKMapItem) {
 		
+		searchVC.sheetPresentationController?.animateChanges {
+			searchVC.sheetPresentationController?.selectedDetentIdentifier = mediumDetentId
+			controllerDidChangeSelectedDetentIdentifier(mediumDetentId)
+		}
 		let placemark = place.placemark
-		
 		dropPin(
 			at: placemark.coordinate,
 			title: placemark.name ?? generateAnnotationTitle()

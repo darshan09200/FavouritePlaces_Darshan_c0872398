@@ -61,7 +61,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource{
 		if !isFiltering && MapData.getInstance().history.count > 0{
 			return "Recent Searches"
 		}
-		return nil
+		return "Search Results"
 	}
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -82,17 +82,22 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource{
 	}
 	
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-		let searchResult: MKLocalSearchCompletion
+		let title: String
+		let subtitle: String
 		if isFiltering{
-			searchResult = searchResults[indexPath.row]
+			let searchResult = searchResults[indexPath.row]
+			title = searchResult.title
+			subtitle = searchResult.subtitle
 		}else{
-			searchResult = MapData.getInstance().history[indexPath.row]
+			let searchResult = MapData.getInstance().history[indexPath.row]
+			title = searchResult.title!
+			subtitle = searchResult.subtitle!
 		}
 		
 		let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
 		
-		cell.textLabel?.text = searchResult.title
-		cell.detailTextLabel?.text = searchResult.subtitle
+		cell.textLabel?.text = title
+		cell.detailTextLabel?.text = subtitle
 		
 		return cell
 	}
@@ -100,22 +105,23 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource{
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		tableView.deselectRow(at: indexPath, animated: true)
 		
-		let result: MKLocalSearchCompletion
+		let searchRequest: MKLocalSearch.Request
 		if isFiltering{
-			result = searchResults[indexPath.row]
-		}else{
-			result = MapData.getInstance().history[indexPath.row]
+			let result = searchResults[indexPath.row]
+			MapData.getInstance().addToHistory(result)
+			searchRequest = MKLocalSearch.Request(completion: result)
+		} else {
+			let record = MapData.getInstance().history[indexPath.row]
+			MapData.getInstance().addToHistory(record)
+			searchRequest = MKLocalSearch.Request()
+			searchRequest.naturalLanguageQuery = record.title! + " " + record.subtitle!
 		}
-		
-		let searchRequest = MKLocalSearch.Request(completion: result)
 		
 		let search = MKLocalSearch(request: searchRequest)
 		search.start { (response, error) in
 			if let mapItem = response?.mapItems.first{
 				self.searchViewDelegate?.dropPin(at: mapItem)
 				self.searchBar.text = ""
-				MapData.getInstance().addToHistory(result)
-
 				self.searchBar(self.searchBar, textDidChange: self.searchBar.text ?? "")
 				self.searchBar.resignFirstResponder()
 			}
@@ -135,7 +141,6 @@ extension SearchViewController: UISearchBarDelegate{
 
 extension SearchViewController: MKLocalSearchCompleterDelegate{
 	func completerDidUpdateResults(_ completer: MKLocalSearchCompleter) {
-		
 		searchResults = completer.results
 		searchResultsTable.reloadData()
 	}

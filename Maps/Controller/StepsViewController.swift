@@ -21,6 +21,12 @@ class StepsViewController: UIViewController {
 		reloadData()
 	}
 	
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
+		
+		reloadData()
+	}
+	
 	func reloadData(){
 		tableView.setContentOffset(.zero, animated: true)
 
@@ -31,10 +37,10 @@ class StepsViewController: UIViewController {
 		var distance = 0.0
 		var viaLabel = ""
 		for (index, route) in routes.enumerated(){
-			if index == routes.endIndex - 1{
+			travelTime += route.route.expectedTravelTime
+			distance += route.route.distance
+			if index == routes.endIndex - 1 {
 				titleLabel.text = "\(routes.count > 1 ? "Round Trip": "") To \(route.title) \(viaLabel)".trimmingCharacters(in: .whitespacesAndNewlines)
-				travelTime += route.route.expectedTravelTime
-				distance += route.route.distance
 			} else{
 				if index == 0{
 					viaLabel += "via "
@@ -74,7 +80,7 @@ extension StepsViewController: UITableViewDelegate, UITableViewDataSource{
 	func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 		if getRoutes().count > 1{
 			let route = getRoutes()[section].route
-			return "Stop \(section+1) - \(route.distance.asTimeString(style: .brief)), \(String(format: "%.2f km", route.distance / 1000))"
+			return "Stop \(section+1) - \(route.expectedTravelTime.asTimeString(style: .brief)), \(String(format: "%.2f km", route.distance / 1000))"
 		}
 		return nil
 	}
