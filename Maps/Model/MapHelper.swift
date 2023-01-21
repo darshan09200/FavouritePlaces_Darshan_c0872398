@@ -35,7 +35,7 @@ class MapHelper{
 	
 	func getRoute(from source: CLLocationCoordinate2D,
 				  to destination: CLLocationCoordinate2D,
-				  transportType: MKDirectionsTransportType = [.automobile, .walking],
+				  transportType: MKDirectionsTransportType = [.automobile],
 				  completion: @escaping(MapRoute)->()){
 		let request = MKDirections.Request()
 		// Source

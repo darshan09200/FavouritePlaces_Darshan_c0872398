@@ -63,7 +63,7 @@ class StepsViewController: UIViewController {
 		
 	}
 	
-	@IBAction func onDonePress(_ sender: Any) {
+	@IBAction func onDonePress() {
 		dismiss(animated: true)
 	}
 	
@@ -116,6 +116,9 @@ extension Double {
 	func asTimeString(style: DateComponentsFormatter.UnitsStyle) -> String {
 		let formatter = DateComponentsFormatter()
 		formatter.allowedUnits = [.hour, .minute]
+		if self < 60 {
+			formatter.allowedUnits = [.minute, .second]
+		}
 		formatter.unitsStyle = style
 		return formatter.string(from: self) ?? ""
 	}

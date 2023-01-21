@@ -254,6 +254,9 @@ extension MapViewController{
 		if coordinates.count < 2 {
 			self.showRoutesBtn.isHidden = true
 			MapData.getInstance().setRoutes([])
+			if self.searchVC.presentedViewController != nil{
+				self.stepsVC.onDonePress()
+			}
 			return
 		}
 		if coordinates.count > 2 {
@@ -300,13 +303,17 @@ extension MapViewController{
 				}
 				
 				MapData.getInstance().setRoutes(mapRoutes)
+				self.mapView.setVisibleMapRect(mapRoutes.last!.route.polyline.boundingMapRect,
+											   edgePadding: self.mapPadding, animated: true)
 				if mapRoutes.count > 0 {
 					self.showRoutesBtn.isHidden = false
 				}
-				self.mapView.setVisibleMapRect(mapRoutes.last!.route.polyline.boundingMapRect,
-											   edgePadding: self.mapPadding, animated: true)
 				if self.searchVC.presentedViewController != nil{
-					self.stepsVC.reloadData()
+					if mapRoutes.count > 0{
+						self.stepsVC.reloadData()
+					}else{
+						self.stepsVC.onDonePress()
+					}
 				}
 			}
 		}

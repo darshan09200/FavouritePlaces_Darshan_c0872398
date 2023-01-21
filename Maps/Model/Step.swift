@@ -13,18 +13,10 @@ enum StepType{
 	case direction
 }
 
-class Step {
+struct Step {
 	var instructions: String?
 	var distance: CLLocationDistance
 	var type: StepType
 	var name: String?
 	var address: String?
-	
-	init(instructions: String? = nil, distance: CLLocationDistance, type: StepType, name: String? = nil, address: String? = nil) {
-		self.instructions = instructions
-		self.distance = distance
-		self.type = type
-		self.name = name
-		self.address = address
-	}
 }
