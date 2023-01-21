@@ -24,7 +24,6 @@ class MapViewController: UIViewController {
 	@IBOutlet weak var zoomStackView: UIStackView!
 	@IBOutlet weak var zoomStackBottomConstraint: NSLayoutConstraint!
 	
-	
 	lazy var currentLocationBtn = MKUserTrackingButton(mapView: mapView)
 	lazy var compassBtn = MKCompassButton(mapView: mapView)
 	
@@ -38,13 +37,36 @@ class MapViewController: UIViewController {
 	
 	var mapType: MapType = .layer
 	
+	lazy var searchVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SearchViewController") as! SearchViewController
+	
+	var mediumDetentId = UISheetPresentationController.Detent.Identifier("medium")
+	lazy var mediumDetent = {
+		let mediumDetent = UISheetPresentationController.Detent.custom(identifier: self.mediumDetentId) { context in
+			return self.view.bounds.height * 0.25
+		}
+		
+		return mediumDetent
+	}
+	
+	var smallDetentId = UISheetPresentationController.Detent.Identifier("small")
+	lazy var smallDetent = {
+		let smallDetent = UISheetPresentationController.Detent.custom(identifier: self.smallDetentId) { context in
+			return self.view.bounds.height * 0.1
+		}
+		
+		return smallDetent
+	}
+	
+	lazy var detents: [UISheetPresentationController.Detent] = [ smallDetent(), mediumDetent(), .large()]
+	
+	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		// Do any additional setup after loading the view.
 		
 		mapView.delegate = self
-		
 		locationManager.delegate = self
+		searchVC.searchViewDelegate = self
 		
 		locationManager.desiredAccuracy = kCLLocationAccuracyBest
 		locationManager.requestWhenInUseAuthorization()
@@ -66,7 +88,12 @@ class MapViewController: UIViewController {
 		let longTapGesture = UILongPressGestureRecognizer(target: self, action: #selector(onMapLongTap(_ :)))
 		mapView.addGestureRecognizer(longTapGesture)
 		
+	}
+	
+	override func viewDidAppear(_ animated: Bool) {
+		super.viewDidAppear(animated)
 		
+		openBottomSheet()
 	}
 	
 	func dropPin(at location: CLLocationCoordinate2D,
@@ -77,6 +104,13 @@ class MapViewController: UIViewController {
 		annotationToAdd.subtitle = subtitle
 		annotationToAdd.coordinate = location
 		
+		if let index = annotations.firstIndex(where: {
+			$0.coordinate.latitude == annotationToAdd.coordinate.latitude
+			&& $0.coordinate.longitude == annotationToAdd.coordinate.longitude
+		}){
+			annotations.remove(at: index)
+			mapView.removeAnnotation(annotationToAdd)
+		}
 		mapView.addAnnotation(annotationToAdd)
 		
 		annotations.append(annotationToAdd)
@@ -122,7 +156,7 @@ class MapViewController: UIViewController {
 		
 		alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
 		
-		self.present(alert, animated: true)
+		searchVC.present(alert, animated: true)
 	}
 	
 	@IBAction func onDimensionClick(_ sender: UIButton) {
@@ -333,7 +367,7 @@ extension MapViewController: MKMapViewDelegate{
 						preferredStyle: .alert
 					)
 					ac.addAction(UIAlertAction(title: "OK", style: .default))
-					self.present(ac, animated: true)
+					self.searchVC.present(ac, animated: true)
 				}
 				return
 			}
@@ -345,7 +379,7 @@ extension MapViewController: MKMapViewDelegate{
 			preferredStyle: .alert
 		)
 		ac.addAction(UIAlertAction(title: "OK", style: .default))
-		self.present(ac, animated: true)
+		self.searchVC.present(ac, animated: true)
 	}
 	
 	func mapView(_ mapView: MKMapView, didSelect annotation: MKAnnotation) {
@@ -374,6 +408,54 @@ extension MapViewController: CLLocationManagerDelegate{
 			}
 			currentLocation = userLocation.coordinate
 		}
+	}
+	
+}
+
+
+
+extension MapViewController: SearchViewDelegate{
+	
+	
+	func openBottomSheet(){
+		if let sheet = searchVC.sheetPresentationController {
+			sheet.prefersGrabberVisible = true
+			sheet.prefersEdgeAttachedInCompactHeight = true
+			sheet.detents = detents
+			sheet.selectedDetentIdentifier = mediumDetentId
+			sheet.largestUndimmedDetentIdentifier = mediumDetentId
+		}
+		
+		searchVC.isModalInPresentation = true
+		self.present(searchVC, animated: true)
+	}
+	
+	
+	func controllerDidChangeSelectedDetentIdentifier(_ selectedDetentIdentifier: UISheetPresentationController.Detent.Identifier?) {
+		if let identifier = selectedDetentIdentifier{
+			if identifier == smallDetentId {
+				self.zoomStackBottomConstraint.constant = self.view.bounds.height * 0.1 + 16
+				
+			} else if identifier == mediumDetentId {
+				self.zoomStackBottomConstraint.constant = self.view.bounds.height * 0.25 + 16
+				
+			}
+			UIView.animate(withDuration: 0.5){
+				self.view.layoutIfNeeded()
+			}
+		}
+	}
+	
+	func dropPin(at place: MKMapItem) {
+		
+		let placemark = place.placemark
+		print(place)
+		
+		dropPin(
+			at: placemark.coordinate,
+			title: place.name ?? "",
+			subtitle: place.phoneNumber ?? ""
+		)
 	}
 	
 }

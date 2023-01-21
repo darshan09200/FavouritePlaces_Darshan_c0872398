@@ -136,6 +136,61 @@
             </objects>
             <point key="canvasLocation" x="-80" y="-120"/>
         </scene>
+        <!--Search View Controller-->
+        <scene sceneID="rSp-Dc-wXt">
+            <objects>
+                <viewController storyboardIdentifier="SearchViewController" id="hg1-Av-A5b" customClass="SearchViewController" customModule="Maps" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="doj-5i-C3N">
+                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <searchBar contentMode="redraw" translatesAutoresizingMaskIntoConstraints="NO" id="ecc-rg-2Aw">
+                                <rect key="frame" x="16" y="75" width="361" height="56"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <scopeButtonTitles>
+                                    <string>Title</string>
+                                    <string>Title</string>
+                                </scopeButtonTitles>
+                            </searchBar>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" estimatedSectionHeaderHeight="-1" sectionFooterHeight="28" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="zEO-hi-VZQ">
+                                <rect key="frame" x="0.0" y="135" width="393" height="683"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" selectionStyle="blue" hidesAccessoryWhenEditing="NO" indentationLevel="1" indentationWidth="0.0" reuseIdentifier="suggestions" id="tQK-Ff-8fE">
+                                        <rect key="frame" x="0.0" y="50" width="393" height="43.666667938232422"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="tQK-Ff-8fE" id="FXT-n0-555">
+                                            <rect key="frame" x="0.0" y="0.0" width="393" height="43.666667938232422"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                                <connections>
+                                    <outlet property="dataSource" destination="hg1-Av-A5b" id="Xly-JK-jyE"/>
+                                    <outlet property="delegate" destination="hg1-Av-A5b" id="cfa-F3-YVF"/>
+                                </connections>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="SBR-4q-Cak"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="zEO-hi-VZQ" firstAttribute="leading" secondItem="SBR-4q-Cak" secondAttribute="leading" id="42b-hg-Za3"/>
+                            <constraint firstItem="SBR-4q-Cak" firstAttribute="trailing" secondItem="zEO-hi-VZQ" secondAttribute="trailing" id="Bt3-3B-Reg"/>
+                            <constraint firstItem="SBR-4q-Cak" firstAttribute="trailing" secondItem="ecc-rg-2Aw" secondAttribute="trailing" constant="16" id="Eya-ty-TwL"/>
+                            <constraint firstItem="SBR-4q-Cak" firstAttribute="bottom" secondItem="zEO-hi-VZQ" secondAttribute="bottom" id="Skf-na-IuW"/>
+                            <constraint firstItem="zEO-hi-VZQ" firstAttribute="top" secondItem="ecc-rg-2Aw" secondAttribute="bottom" constant="4" id="dee-wB-xwg"/>
+                            <constraint firstItem="ecc-rg-2Aw" firstAttribute="top" secondItem="SBR-4q-Cak" secondAttribute="top" constant="16" id="kxB-ML-nl2"/>
+                            <constraint firstItem="ecc-rg-2Aw" firstAttribute="leading" secondItem="SBR-4q-Cak" secondAttribute="leading" constant="16" id="oZN-aB-KB8"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="searchBar" destination="ecc-rg-2Aw" id="9dO-pD-GGC"/>
+                        <outlet property="searchResultsTable" destination="zEO-hi-VZQ" id="hTz-os-9ud"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="0OH-4z-cKV" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="842" y="-120"/>
+        </scene>
     </scenes>
     <resources>
         <image name="car" catalog="system" width="128" height="95"/>

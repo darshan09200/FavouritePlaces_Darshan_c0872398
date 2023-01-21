@@ -17,6 +17,8 @@
 		557FDD3B297B6BDE00191FE7 /* LabelAnnotationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FDD3A297B6BDE00191FE7 /* LabelAnnotationView.swift */; };
 		557FDD3D297B6C4300191FE7 /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FDD3C297B6C4300191FE7 /* Annotation.swift */; };
 		557FDD40297B6E2800191FE7 /* MapRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FDD3F297B6E2800191FE7 /* MapRoute.swift */; };
+		557FDD42297B83C600191FE7 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FDD41297B83C600191FE7 /* SearchViewController.swift */; };
+		557FDD44297B857D00191FE7 /* SearchHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FDD43297B857D00191FE7 /* SearchHistory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +34,8 @@
 		557FDD3A297B6BDE00191FE7 /* LabelAnnotationView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LabelAnnotationView.swift; sourceTree = "<group>"; };
 		557FDD3C297B6C4300191FE7 /* Annotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
 		557FDD3F297B6E2800191FE7 /* MapRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapRoute.swift; sourceTree = "<group>"; };
+		557FDD41297B83C600191FE7 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
+		557FDD43297B857D00191FE7 /* SearchHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchHistory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,7 +75,6 @@
 				557FDD22297B5B4300191FE7 /* SceneDelegate.swift */,
 				557FDD29297B5B4400191FE7 /* Assets.xcassets */,
 				557FDD2E297B5B4400191FE7 /* Info.plist */,
-				557FDD36297B66EF00191FE7 /* MapHelper.swift */,
 			);
 			path = Maps;
 			sourceTree = "<group>";
@@ -91,6 +94,7 @@
 			isa = PBXGroup;
 			children = (
 				557FDD24297B5B4300191FE7 /* MapViewController.swift */,
+				557FDD41297B83C600191FE7 /* SearchViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -98,7 +102,9 @@
 		557FDD3E297B6E0900191FE7 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				557FDD36297B66EF00191FE7 /* MapHelper.swift */,
 				557FDD3F297B6E2800191FE7 /* MapRoute.swift */,
+				557FDD43297B857D00191FE7 /* SearchHistory.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -175,7 +181,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				557FDD37297B66EF00191FE7 /* MapHelper.swift in Sources */,
+				557FDD44297B857D00191FE7 /* SearchHistory.swift in Sources */,
 				557FDD3B297B6BDE00191FE7 /* LabelAnnotationView.swift in Sources */,
+				557FDD42297B83C600191FE7 /* SearchViewController.swift in Sources */,
 				557FDD25297B5B4300191FE7 /* MapViewController.swift in Sources */,
 				557FDD21297B5B4300191FE7 /* AppDelegate.swift in Sources */,
 				557FDD3D297B6C4300191FE7 /* Annotation.swift in Sources */,
