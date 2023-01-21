@@ -39,7 +39,7 @@
                                 <standardMapConfiguration key="preferredConfiguration" showsTraffic="YES"/>
                             </mapView>
                             <stackView opaque="NO" clipsSubviews="YES" contentMode="scaleToFill" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="YId-Tp-Ghd">
-                                <rect key="frame" x="322.33333333333331" y="119" width="54.666666666666686" height="117.33333333333331"/>
+                                <rect key="frame" x="322.33333333333331" y="119" width="54.666666666666686" height="180"/>
                                 <subviews>
                                     <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QQp-vp-fyc">
                                         <rect key="frame" x="0.0" y="0.0" width="54.666666666666664" height="54.666666666666664"/>
@@ -64,6 +64,17 @@
                                         <buttonConfiguration key="configuration" style="filled" image="view.3d" catalog="system"/>
                                         <connections>
                                             <action selector="onDimensionClick:" destination="vNz-Qc-MdM" eventType="touchUpInside" id="8DK-rB-EqC"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="USz-ev-8PF">
+                                        <rect key="frame" x="0.0" y="125.33333333333336" width="54.666666666666664" height="54.666666666666671"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" secondItem="USz-ev-8PF" secondAttribute="height" multiplier="1:1" id="9gG-SF-0WO"/>
+                                        </constraints>
+                                        <state key="normal" title="Button"/>
+                                        <buttonConfiguration key="configuration" style="filled" image="triangle" catalog="system"/>
+                                        <connections>
+                                            <action selector="onLayerRoutePress:" destination="vNz-Qc-MdM" eventType="touchUpInside" id="K8r-xo-p7c"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -117,8 +128,6 @@
                     <connections>
                         <outlet property="mapConfigStackView" destination="YId-Tp-Ghd" id="y1e-xW-sxz"/>
                         <outlet property="mapView" destination="ZPB-Q6-WV4" id="jcG-dH-Y0r"/>
-                        <outlet property="zoomInBtn" destination="XmA-25-RTl" id="m4r-9g-YdE"/>
-                        <outlet property="zoomOutBtn" destination="2eb-eH-JZR" id="bqO-b1-LdH"/>
                         <outlet property="zoomStackBottomConstraint" destination="ego-7J-d5J" id="K50-dL-KnW"/>
                         <outlet property="zoomStackView" destination="elO-a8-bce" id="5mK-tb-Igb"/>
                     </connections>
@@ -132,6 +141,7 @@
         <image name="map.fill" catalog="system" width="128" height="110"/>
         <image name="minus" catalog="system" width="128" height="26"/>
         <image name="plus" catalog="system" width="128" height="113"/>
+        <image name="triangle" catalog="system" width="128" height="109"/>
         <image name="view.3d" catalog="system" width="128" height="76"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
