@@ -10,6 +10,8 @@ import MapKit
 
 class MapViewController: UIViewController {
 	
+	static let characters = Array("ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+	
 	@IBOutlet weak var mapView: MKMapView!
 	
 	@IBOutlet weak var mapConfigStackView: UIStackView!
@@ -26,6 +28,8 @@ class MapViewController: UIViewController {
 	var locationManager = CLLocationManager()
 	
 	var currentLocation: CLLocationCoordinate2D?
+	
+	var annotations = [MKPointAnnotation]()
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -52,7 +56,42 @@ class MapViewController: UIViewController {
 		mapConfigStackView.addArrangedSubview(compassBtn)
 		currentLocationBtn.widthAnchor.constraint(equalToConstant: compassBtn.frame.width).isActive = true
 		
+		let longTapGesture = UILongPressGestureRecognizer(target: self, action: #selector(onMapLongTap(_ :)))
+		mapView.addGestureRecognizer(longTapGesture)
+		
+		
 	}
+	
+	func dropPin(at location: CLLocationCoordinate2D,
+						 title: String,
+						 subtitle: String? = nil) {
+		let annotationToAdd = MKPointAnnotation()
+		annotationToAdd.title = title
+		annotationToAdd.subtitle = subtitle
+		annotationToAdd.coordinate = location
+		
+		mapView.addAnnotation(annotationToAdd)
+		
+		annotations.append(annotationToAdd)
+		
+		let camera = mapView.camera.copy() as! MKMapCamera
+		camera.centerCoordinate = location
+		camera.centerCoordinateDistance = 500
+		
+		mapView.setCamera(camera, animated: true)
+		
+	}
+	
+	@objc func onMapLongTap(_ sender: UILongPressGestureRecognizer){
+		if sender.state == .ended {
+			let point = sender.location(in: mapView)
+			let coordinate = mapView.convert(point, toCoordinateFrom: mapView)
+			
+			let title = String(MapViewController.characters[annotations.count])
+			dropPin(at: coordinate, title: title)
+		}
+	}
+	
 	
 	@IBAction func onMapConfigPress(_ sender: Any) {
 		let alert = UIAlertController()
@@ -103,7 +142,6 @@ extension MapViewController: MKMapViewDelegate{
 		camera.centerCoordinateDistance *= delta
 		mapView.setCamera(camera, animated: true)
 	}
-	
 }
 
 
