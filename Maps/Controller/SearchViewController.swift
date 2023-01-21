@@ -60,8 +60,10 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource{
 	func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
 		if !isFiltering && MapData.getInstance().history.count > 0{
 			return "Recent Searches"
+		} else if isFiltering{
+			return "Search Results"
 		}
-		return "Search Results"
+		return nil
 	}
 	
 	func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
