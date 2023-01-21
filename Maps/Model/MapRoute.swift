@@ -9,13 +9,48 @@ import UIKit
 import MapKit
 
 class MapRoute {
-	private(set) var from: CLLocationCoordinate2D
-	private(set) var to: CLLocationCoordinate2D
+	private(set) var source: CLLocationCoordinate2D
+	private(set) var destination: CLLocationCoordinate2D
 	private(set) var route: MKRoute
+	var formattedSteps: [Step]{
+		var steps = [Step]()
+		route.steps.forEach{ step in
+			if step.distance == 0 {
+				steps.append(Step(distance: 0, type: .start, name: sourceInfo.name, address: sourceInfo.getAddress()))
+			} else {
+				steps.append(Step(instructions: step.instructions, distance: step.distance, type: .direction))
+			}
+		}
+		steps.append(Step(distance: 0, type: .end, name: destinationInfo.name, address: destinationInfo.getAddress()))
+		return steps
+	}
+	var title: String{
+		if let last = formattedSteps.last{
+			return last.name ?? route.name
+		}
+		return route.name
+	}
+	private(set) var sourceInfo: CLPlacemark
+	private(set) var destinationInfo: CLPlacemark
 	
-	init(from: CLLocationCoordinate2D, to: CLLocationCoordinate2D, route: MKRoute) {
-		self.from = from
-		self.to = to
+	init(source: CLLocationCoordinate2D,
+		 destination: CLLocationCoordinate2D,
+		 route: MKRoute,
+		 sourceInfo: CLPlacemark,
+		 destinationInfo: CLPlacemark) {
+		self.source = source
+		self.destination = destination
 		self.route = route
+		self.sourceInfo = sourceInfo
+		self.destinationInfo = destinationInfo
+	}
+}
+
+extension CLPlacemark {
+	
+	func getAddress() -> String {
+		return [subThoroughfare, thoroughfare, locality, administrativeArea, postalCode, country]
+			.compactMap({ $0 })
+			.joined(separator: " ")
 	}
 }

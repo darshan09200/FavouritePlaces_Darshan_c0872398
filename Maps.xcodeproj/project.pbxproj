@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5524CE43297BB01C007B200E /* StepsTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5524CE42297BB01C007B200E /* StepsTableViewCell.swift */; };
+		5524CE45297BB09C007B200E /* StepsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5524CE44297BB09C007B200E /* StepsViewController.swift */; };
+		5524CE47297BD1CA007B200E /* Step.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5524CE46297BD1CA007B200E /* Step.swift */; };
 		557FDD21297B5B4300191FE7 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FDD20297B5B4300191FE7 /* AppDelegate.swift */; };
 		557FDD23297B5B4300191FE7 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FDD22297B5B4300191FE7 /* SceneDelegate.swift */; };
 		557FDD25297B5B4300191FE7 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FDD24297B5B4300191FE7 /* MapViewController.swift */; };
@@ -18,10 +21,13 @@
 		557FDD3D297B6C4300191FE7 /* Annotation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FDD3C297B6C4300191FE7 /* Annotation.swift */; };
 		557FDD40297B6E2800191FE7 /* MapRoute.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FDD3F297B6E2800191FE7 /* MapRoute.swift */; };
 		557FDD42297B83C600191FE7 /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FDD41297B83C600191FE7 /* SearchViewController.swift */; };
-		557FDD44297B857D00191FE7 /* SearchHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FDD43297B857D00191FE7 /* SearchHistory.swift */; };
+		557FDD44297B857D00191FE7 /* MapData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 557FDD43297B857D00191FE7 /* MapData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5524CE42297BB01C007B200E /* StepsTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepsTableViewCell.swift; sourceTree = "<group>"; };
+		5524CE44297BB09C007B200E /* StepsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StepsViewController.swift; sourceTree = "<group>"; };
+		5524CE46297BD1CA007B200E /* Step.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Step.swift; sourceTree = "<group>"; };
 		557FDD1D297B5B4300191FE7 /* Maps.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Maps.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		557FDD20297B5B4300191FE7 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		557FDD22297B5B4300191FE7 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -35,7 +41,7 @@
 		557FDD3C297B6C4300191FE7 /* Annotation.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Annotation.swift; sourceTree = "<group>"; };
 		557FDD3F297B6E2800191FE7 /* MapRoute.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapRoute.swift; sourceTree = "<group>"; };
 		557FDD41297B83C600191FE7 /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
-		557FDD43297B857D00191FE7 /* SearchHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchHistory.swift; sourceTree = "<group>"; };
+		557FDD43297B857D00191FE7 /* MapData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -86,6 +92,7 @@
 				557FDD26297B5B4300191FE7 /* Main.storyboard */,
 				557FDD2B297B5B4400191FE7 /* LaunchScreen.storyboard */,
 				557FDD3C297B6C4300191FE7 /* Annotation.swift */,
+				5524CE42297BB01C007B200E /* StepsTableViewCell.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -95,6 +102,7 @@
 			children = (
 				557FDD24297B5B4300191FE7 /* MapViewController.swift */,
 				557FDD41297B83C600191FE7 /* SearchViewController.swift */,
+				5524CE44297BB09C007B200E /* StepsViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -104,7 +112,8 @@
 			children = (
 				557FDD36297B66EF00191FE7 /* MapHelper.swift */,
 				557FDD3F297B6E2800191FE7 /* MapRoute.swift */,
-				557FDD43297B857D00191FE7 /* SearchHistory.swift */,
+				557FDD43297B857D00191FE7 /* MapData.swift */,
+				5524CE46297BD1CA007B200E /* Step.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -181,10 +190,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				557FDD37297B66EF00191FE7 /* MapHelper.swift in Sources */,
-				557FDD44297B857D00191FE7 /* SearchHistory.swift in Sources */,
+				5524CE45297BB09C007B200E /* StepsViewController.swift in Sources */,
+				557FDD44297B857D00191FE7 /* MapData.swift in Sources */,
 				557FDD3B297B6BDE00191FE7 /* LabelAnnotationView.swift in Sources */,
 				557FDD42297B83C600191FE7 /* SearchViewController.swift in Sources */,
+				5524CE47297BD1CA007B200E /* Step.swift in Sources */,
 				557FDD25297B5B4300191FE7 /* MapViewController.swift in Sources */,
+				5524CE43297BB01C007B200E /* StepsTableViewCell.swift in Sources */,
 				557FDD21297B5B4300191FE7 /* AppDelegate.swift in Sources */,
 				557FDD3D297B6C4300191FE7 /* Annotation.swift in Sources */,
 				557FDD40297B6E2800191FE7 /* MapRoute.swift in Sources */,

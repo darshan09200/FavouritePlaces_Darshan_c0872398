@@ -17,10 +17,26 @@ class MapHelper{
 		return instance;
 	}
 	
+	func getAddress(of location: CLLocationCoordinate2D,
+					completion: @escaping(CLPlacemark?)->()){
+		let geocoder = CLGeocoder()
+		
+		geocoder.reverseGeocodeLocation(CLLocation(latitude: location.latitude, longitude: location.longitude),
+										completionHandler: { (placemarks, error) in
+			if error == nil {
+				let firstLocation = placemarks?.first
+				completion(firstLocation)
+			}
+			else {
+				completion(nil)
+			}
+		})
+	}
+	
 	func getRoute(from source: CLLocationCoordinate2D,
 				  to destination: CLLocationCoordinate2D,
 				  transportType: MKDirectionsTransportType = [.automobile, .walking],
-				  completion: @escaping(MKRoute)->()){
+				  completion: @escaping(MapRoute)->()){
 		let request = MKDirections.Request()
 		// Source
 		let sourcePlaceMark = MKPlacemark(coordinate: source)
@@ -39,8 +55,27 @@ class MapHelper{
 			}
 			
 			let route = response.routes[0]
+			var sourceInfo: CLPlacemark?
+			var destinationInfo: CLPlacemark?
 			
-			completion(route)
+			self.getAddress(of: source){
+				placemark in
+				sourceInfo = placemark ?? sourcePlaceMark
+				checkIfComplete()
+			}
+			
+			self.getAddress(of: destination){
+				placemark in
+				destinationInfo = placemark ?? destPlaceMark
+				checkIfComplete()
+			}			
+			
+			func checkIfComplete(){
+				if let sourceInfo = sourceInfo, let destinationInfo = destinationInfo{
+					let mapRoute = MapRoute(source: source, destination: destination, route: route, sourceInfo: sourceInfo, destinationInfo: destinationInfo)
+					completion(mapRoute)
+				}
+			}
 		}
 	}
 	
@@ -65,13 +100,22 @@ class MapHelper{
 		routeCoordinate.forEach{
 			coordinates in
 			getRoute(from: coordinates[0], to: coordinates[1], transportType: transportType){route in
-				let mapRoute = MapRoute(from: coordinates[0],
-										to: coordinates[1],
-										route: route)
-				routes.append(mapRoute)
+				routes.append(route)
 				
 				if routes.count == routeCoordinate.count{
-					completion(routes)
+					var sortedRoutes = [MapRoute]()
+					routeCoordinate.forEach{
+						coordinate in
+						if let route = routes.first(where: {
+							$0.source.latitude == coordinate[0].latitude
+							&& $0.source.longitude == coordinate[0].longitude
+							&& $0.destination.latitude == coordinate[1].latitude
+							&& $0.destination.longitude == coordinate[1].longitude
+						}){
+							sortedRoutes.append(route)
+						}
+					}
+					completion(sortedRoutes)
 				}
 			}
 		}

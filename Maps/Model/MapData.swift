@@ -6,14 +6,15 @@
 //
 import MapKit
 
-class SearchHistory {
-	static let instance = SearchHistory()
+class MapData {
+	static let instance = MapData()
 	
 	private(set) var history = [MKLocalSearchCompletion]()
+	private(set) var routes = [MapRoute]()
 	
 	private init(){}
 	
-	static func getInstance()->SearchHistory{
+	static func getInstance()->MapData{
 		return instance;
 	}
 	
@@ -24,4 +25,8 @@ class SearchHistory {
 		history.insert(item, at: 0)
 	}
 	
+	
+	func setRoutes(_ routes: [MapRoute]){
+		self.routes = routes
+	}
 }

@@ -58,7 +58,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource{
 	}
 	
 	func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		if !isFiltering && SearchHistory.getInstance().history.count > 0{
+		if !isFiltering && MapData.getInstance().history.count > 0{
 			return "Recent Searches"
 		}
 		return nil
@@ -71,7 +71,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource{
 			count = searchResults.count
 			title = "No address available"
 		} else {
-			count = SearchHistory.getInstance().history.count
+			count = MapData.getInstance().history.count
 		}
 		if count == 0 {
 			tableView.setEmptyView(title: title)
@@ -86,7 +86,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource{
 		if isFiltering{
 			searchResult = searchResults[indexPath.row]
 		}else{
-			searchResult = SearchHistory.getInstance().history[indexPath.row]
+			searchResult = MapData.getInstance().history[indexPath.row]
 		}
 		
 		let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
@@ -104,7 +104,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource{
 		if isFiltering{
 			result = searchResults[indexPath.row]
 		}else{
-			result = SearchHistory.getInstance().history[indexPath.row]
+			result = MapData.getInstance().history[indexPath.row]
 		}
 		
 		let searchRequest = MKLocalSearch.Request(completion: result)
@@ -114,7 +114,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource{
 			if let mapItem = response?.mapItems.first{
 				self.searchViewDelegate?.dropPin(at: mapItem)
 				self.searchBar.text = ""
-				SearchHistory.getInstance().addToHistory(result)
+				MapData.getInstance().addToHistory(result)
 
 				self.searchBar(self.searchBar, textDidChange: self.searchBar.text ?? "")
 				self.searchBar.resignFirstResponder()

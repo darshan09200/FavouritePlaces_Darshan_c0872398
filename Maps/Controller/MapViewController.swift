@@ -24,6 +24,7 @@ class MapViewController: UIViewController {
 	@IBOutlet weak var zoomStackView: UIStackView!
 	@IBOutlet weak var zoomStackBottomConstraint: NSLayoutConstraint!
 	
+	@IBOutlet weak var showRoutesBtn: UIButton!
 	lazy var currentLocationBtn = MKUserTrackingButton(mapView: mapView)
 	lazy var compassBtn = MKCompassButton(mapView: mapView)
 	
@@ -38,6 +39,8 @@ class MapViewController: UIViewController {
 	var mapType: MapType = .layer
 	
 	lazy var searchVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SearchViewController") as! SearchViewController
+	
+	lazy var stepsVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "StepsViewController") as! StepsViewController
 	
 	var mediumDetentId = UISheetPresentationController.Detent.Identifier("medium")
 	lazy var mediumDetent = {
@@ -58,7 +61,6 @@ class MapViewController: UIViewController {
 	}
 	
 	lazy var detents: [UISheetPresentationController.Detent] = [ smallDetent(), mediumDetent(), .large()]
-	
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -137,8 +139,9 @@ class MapViewController: UIViewController {
 			let point = sender.location(in: mapView)
 			let coordinate = mapView.convert(point, toCoordinateFrom: mapView)
 			
-			let title = generateAnnotationTitle()
-			dropPin(at: coordinate, title: title)
+			MapHelper.getInstance().getAddress(of: coordinate){ placemark in
+				self.dropPin(at: coordinate, title: placemark?.name ?? self.generateAnnotationTitle())
+			}
 		}
 	}
 	
@@ -204,6 +207,28 @@ class MapViewController: UIViewController {
 		onAnnotationsUpdated()
 	}
 	
+	@IBAction func onShowRoutePress() {
+		if searchVC.presentedViewController != nil{
+			stepsVC.reloadData()
+			if let sheet = stepsVC.sheetPresentationController {
+				sheet.animateChanges {
+					sheet.selectedDetentIdentifier = .large
+				}
+			}
+		} else {
+			if let sheet = stepsVC.sheetPresentationController {
+				sheet.prefersGrabberVisible = true
+				sheet.prefersEdgeAttachedInCompactHeight = true
+				var detents = Array(detents)
+				detents.remove(at: 0)
+				sheet.detents = detents
+				sheet.selectedDetentIdentifier = .large
+				sheet.largestUndimmedDetentIdentifier = mediumDetentId
+			}
+			searchVC.present(stepsVC, animated: true)
+		}
+	}
+	
 }
 
 extension MapViewController{
@@ -223,6 +248,8 @@ extension MapViewController{
 		}
 		var coordinates = annotations.map { $0.coordinate }
 		if coordinates.count < 2 {
+			self.showRoutesBtn.isHidden = true
+			MapData.getInstance().setRoutes([])
 			return
 		}
 		if coordinates.count > 2 {
@@ -230,6 +257,7 @@ extension MapViewController{
 		}
 		
 		if mapType == .layer{
+			showRoutesBtn.isHidden = true
 			if points.count == 3 {
 				let polygon = MKPolygon(points: &points, count: points.count)
 				polygon.title = "overlay"
@@ -239,8 +267,8 @@ extension MapViewController{
 					mapRoutes.forEach{
 						mapRoute in
 						let route = mapRoute.route
-						let centerLat = (mapRoute.from.latitude + mapRoute.to.latitude) / 2
-						let centerLong = (mapRoute.from.longitude + mapRoute.to.longitude) / 2
+						let centerLat = (mapRoute.source.latitude + mapRoute.destination.latitude) / 2
+						let centerLong = (mapRoute.source.longitude + mapRoute.destination.longitude) / 2
 						self.addDistanceLabel(for: route, at: CLLocationCoordinate2D(latitude: centerLat, longitude: centerLong))
 						
 					}
@@ -258,17 +286,24 @@ extension MapViewController{
 			}
 		} else {
 			MapHelper.getInstance().getBatchRoutes(from: coordinates){mapRoutes in
-				var boundingMapRect = mapRoutes.first?.route.polyline.boundingMapRect
 				mapRoutes.forEach{
 					mapRoute in
 					let route = mapRoute.route
-					boundingMapRect = route.polyline.boundingMapRect
+					
 					route.polyline.title = "route"
 					self.mapView.addOverlay(route.polyline)
 					self.addDistanceLabel(for: route)
 				}
 				
-				self.mapView.setVisibleMapRect(boundingMapRect!, edgePadding: self.mapPadding, animated: true)
+				MapData.getInstance().setRoutes(mapRoutes)
+				if mapRoutes.count > 0 {
+					self.showRoutesBtn.isHidden = false
+				}
+				self.mapView.setVisibleMapRect(mapRoutes.last!.route.polyline.boundingMapRect,
+											   edgePadding: self.mapPadding, animated: true)
+				if self.searchVC.presentedViewController != nil{
+					self.stepsVC.reloadData()
+				}
 			}
 		}
 	}
@@ -359,8 +394,8 @@ extension MapViewController: MKMapViewDelegate{
 		if let userLocation = currentLocation {
 			if let annotation = view.annotation{
 				MapHelper.getInstance().getRoute(from: userLocation, to: annotation.coordinate){
-					route in
-					let distance = String(format: "%.2f", route.distance / 1000)
+					mapRoute in
+					let distance = String(format: "%.2f", mapRoute.route.distance / 1000)
 					let ac = UIAlertController(
 						title: "Location: \(annotation.title! ?? "")",
 						message: "Distance from your current location is \(distance) kms",
@@ -449,12 +484,10 @@ extension MapViewController: SearchViewDelegate{
 	func dropPin(at place: MKMapItem) {
 		
 		let placemark = place.placemark
-		print(place)
 		
 		dropPin(
 			at: placemark.coordinate,
-			title: place.name ?? "",
-			subtitle: place.phoneNumber ?? ""
+			title: placemark.name ?? generateAnnotationTitle()
 		)
 	}
 	
