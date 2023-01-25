@@ -36,7 +36,7 @@ class MapViewController: UIViewController {
 	
 	let mapPadding = UIEdgeInsets(top: 64, left: 64, bottom: 64, right: 64)
 	
-	var mapType: MapType = .layer
+	var mapType: MapType = .route
 	
 	lazy var searchVC = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "SearchViewController") as! SearchViewController
 	
@@ -163,6 +163,12 @@ class MapViewController: UIViewController {
 			self.mapView.mapType = .satelliteFlyover
 		}))
 		
+		alert.addAction(UIAlertAction(title: "\(shouldDrawOverlay ? "Disable": "Enable") Draw", style: .default , handler:{ (UIAlertAction)in
+			self.shouldDrawOverlay = !self.shouldDrawOverlay
+			
+			self.redrawOverlay()
+		}))
+		
 		alert.addAction(UIAlertAction(title: "Dismiss", style: .cancel, handler: nil))
 		
 		searchVC.present(alert, animated: true)
@@ -214,6 +220,8 @@ class MapViewController: UIViewController {
 	}
 	
 	@IBAction func onShowRoutePress() {
+		redrawOverlay()
+		
 		if searchVC.presentedViewController != nil{
 			stepsVC.reloadData()
 			if let sheet = stepsVC.sheetPresentationController {
@@ -253,23 +261,24 @@ extension MapViewController {
 		removeOverlay("polygon")
 		removeOverlay("route")
 		removeAllDistanceLabel()
-		if shouldDrawOverlay{
-			var points = [MKMapPoint]()
-			
-			self.annotations.forEach{ annotation in
-				if annotation.type == .pin {
-					points.append(MKMapPoint(annotation.coordinate))
-				}
+		
+		var points = [MKMapPoint]()
+		
+		self.annotations.forEach{ annotation in
+			if annotation.type == .pin {
+				points.append(MKMapPoint(annotation.coordinate))
 			}
-			var coordinates = annotations.map { $0.coordinate }
-			if coordinates.count < 2 {
-				self.showRoutesBtn.isHidden = true
-				MapData.getInstance().setRoutes([])
-				if self.searchVC.presentedViewController != nil{
-					self.stepsVC.onDonePress()
-				}
-				return
+		}
+		var coordinates = annotations.map { $0.coordinate }
+		if coordinates.count < 2 {
+			self.showRoutesBtn.isHidden = true
+			MapData.getInstance().setRoutes([])
+			if self.searchVC.presentedViewController != nil{
+				self.stepsVC.onDonePress()
 			}
+			return
+		}
+		if shouldDrawOverlay {
 			if coordinates.count > 2 {
 				coordinates.append(coordinates.first!)
 			}

@@ -73,7 +73,7 @@
                                             <constraint firstAttribute="width" secondItem="USz-ev-8PF" secondAttribute="height" multiplier="1:1" id="9gG-SF-0WO"/>
                                         </constraints>
                                         <state key="normal" title="Button"/>
-                                        <buttonConfiguration key="configuration" style="filled" image="car" catalog="system"/>
+                                        <buttonConfiguration key="configuration" style="filled" image="triangle" catalog="system"/>
                                         <connections>
                                             <action selector="onLayerRoutePress:" destination="vNz-Qc-MdM" eventType="touchUpInside" id="K8r-xo-p7c"/>
                                         </connections>
@@ -354,11 +354,11 @@
         </scene>
     </scenes>
     <resources>
-        <image name="car" catalog="system" width="128" height="95"/>
         <image name="map.fill" catalog="system" width="128" height="110"/>
         <image name="mappin" catalog="system" width="106" height="128"/>
         <image name="minus" catalog="system" width="128" height="26"/>
         <image name="plus" catalog="system" width="128" height="113"/>
+        <image name="triangle" catalog="system" width="128" height="109"/>
         <image name="view.3d" catalog="system" width="128" height="76"/>
         <namedColor name="AccentColor">
             <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
