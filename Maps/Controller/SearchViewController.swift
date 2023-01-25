@@ -46,12 +46,6 @@ class SearchViewController: UIViewController {
 	@objc func applicationDidBecomeActive(notification: NSNotification){
 		searchViewDelegate?.controllerDidChangeSelectedDetentIdentifier(sheetPresentationController?.selectedDetentIdentifier)
 	}
-	
-	func handleMoveToTrash(_ item: SearchHistory, deleteRecord: Bool = false){
-		MapData.getInstance().removeFromRecents(item, deleteRecord: deleteRecord)
-		
-		searchViewDelegate?.deleteAnnotation(location: CLLocationCoordinate2D(latitude: item.latitude, longitude: item.longitude))
-	}
 }
 
 extension SearchViewController: UISheetPresentationControllerDelegate{
@@ -63,17 +57,19 @@ extension SearchViewController: UISheetPresentationControllerDelegate{
 extension SearchViewController: UITableViewDelegate, UITableViewDataSource{
 	func numberOfSections(in tableView: UITableView) -> Int {
 		return 2
+//		if MapData.getInstance().history.count > 0 || isFiltering{
+//		}
+//		return 1
 	}
 	
 	func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-		if section == 0 {
+		if isFiltering{
+			if section == 1 { return nil}
+			return "Search Results"
+		}else if section == 0 {
 			return "Favourites"
-		} else if section == 1{
-			if !isFiltering && MapData.getInstance().history.count > 0{
-				return "Recent Searches"
-			} else if isFiltering{
-				return "Search Results"
-			}
+		} else if section == 1 && MapData.getInstance().history.count > 0{
+			return "Recent Searches"
 		}
 		return nil
 	}
@@ -82,11 +78,12 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource{
 		var count = 0
 		var title = "No recent searches"
 		if isFiltering {
+			if section == 1 { return 0 }
 			count = searchResults.count
 			title = "No address available"
 		} else {
 			if section == 0 {
-				return MapData.getInstance().favourites.count
+				return max(MapData.getInstance().favourites.count, 1)
 			}
 			count = MapData.getInstance().history.count
 		}
@@ -102,14 +99,23 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource{
 	func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
 		let title: String
 		let subtitle: String
-		if indexPath.section == 0{
-			let favourite = MapData.getInstance().favourites[indexPath.row]
-			title = favourite.title!
-			subtitle = favourite.subtitle!
-		} else if isFiltering {
+		var selectionStyle: UITableViewCell.SelectionStyle = .default
+		
+		if isFiltering {
 			let searchResult = searchResults[indexPath.row]
 			title = searchResult.title
 			subtitle = searchResult.subtitle
+		} else if indexPath.section == 0{
+			let data = MapData.getInstance().favourites
+			if data.count > 0{
+				let favourite = data[indexPath.row]
+				title = favourite.title!
+				subtitle = favourite.subtitle!
+			}else{
+				title = "No Favourites to show"
+				subtitle = ""
+				selectionStyle = .none
+			}
 		} else {
 			let searchResult = MapData.getInstance().history[indexPath.row]
 			title = searchResult.title!
@@ -117,7 +123,7 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource{
 		}
 		
 		let cell = UITableViewCell(style: .subtitle, reuseIdentifier: nil)
-		
+		cell.selectionStyle = selectionStyle
 		cell.textLabel?.text = title
 		cell.detailTextLabel?.text = subtitle
 		
@@ -127,68 +133,95 @@ extension SearchViewController: UITableViewDelegate, UITableViewDataSource{
 	func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		tableView.deselectRow(at: indexPath, animated: true)
 		
-		let searchRequest: MKLocalSearch.Request
+		if !isFiltering{
+			if indexPath.section == 0 {
+				let data = MapData.getInstance().favourites
+				if data.count == 0 {return}
+				let favourite = data[indexPath.row]
+				MapData.getInstance().addToHistory(favourite)
+				
+				dropPin(at: Pin(title: favourite.title!, subtitle: favourite.subtitle!, coordinate: CLLocationCoordinate2D(latitude: favourite.latitude, longitude: favourite.longitude)))
+				return
+			} else {
+				let historyItem = MapData.getInstance().history[indexPath.row]
+				MapData.getInstance().addToHistory(historyItem)
+				dropPin(at: Pin(title: historyItem.title!, subtitle: historyItem.subtitle!, coordinate: CLLocationCoordinate2D(latitude: historyItem.latitude, longitude: historyItem.longitude)))
+				return
+			}
+		}
+		let result = searchResults[indexPath.row]
+		let searchRequest = MKLocalSearch.Request(completion: result)
 		
-		var record: Pin?
-		if indexPath.section == 0{
-			let favourite = MapData.getInstance().favourites[indexPath.row]
-			MapData.getInstance().addToHistory(favourite)
-			searchRequest = MKLocalSearch.Request()
-			searchRequest.naturalLanguageQuery = favourite.title! + " " + favourite.subtitle!
-		} else if isFiltering {
-			let result = searchResults[indexPath.row]
-			record = Pin(title: result.title, subtitle: result.subtitle)
-			searchRequest = MKLocalSearch.Request(completion: result)
-		} else {
-			let record = MapData.getInstance().history[indexPath.row]
-			MapData.getInstance().addToHistory(record)
-			searchRequest = MKLocalSearch.Request()
-			searchRequest.naturalLanguageQuery = record.title! + " " + record.subtitle!
-		}
-		if indexPath.row > 0{
-			tableView.beginUpdates()
-			
-			tableView.deleteRows(at: [indexPath], with: .automatic)
-			tableView.insertRows(at: [IndexPath(row: 0, section: indexPath.section)], with: .automatic)
-			
-			tableView.endUpdates()
-		}
 		let search = MKLocalSearch(request: searchRequest)
 		search.start { (response, error) in
 			if let mapItem = response?.mapItems.first{
-				self.searchViewDelegate?.dropPin(at: mapItem)
-				self.searchBar.text = ""
-				self.searchBar(self.searchBar, textDidChange: self.searchBar.text ?? "")
-				self.searchBar.resignFirstResponder()
-				if var record = record{
-					record.coordinate = mapItem.placemark.coordinate
-					MapData.getInstance().addToHistory(record)
-				}
+				var record = Pin(title: mapItem.placemark.name ?? "",
+								 subtitle: mapItem.placemark.getAddress(),
+								 coordinate: mapItem.placemark.coordinate)
+				self.dropPin(at: record)
+				MapData.getInstance().addToHistory(record)
+				
+				tableView.insertRows(at: [IndexPath(row: 0, section: 1)], with: .automatic)
+				
 			}
 		}
 	}
 	
+	func dropPin(at pin: Pin){
+		self.searchViewDelegate?.dropPin(at: pin)
+		self.searchBar.text = ""
+		self.searchBar(self.searchBar, textDidChange: self.searchBar.text ?? "")
+		self.searchBar.resignFirstResponder()
+		
+	}
+	
 	func tableView(_ tableView: UITableView,
 				   trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-		if isFiltering {
+		if isFiltering || (indexPath.section == 0 && MapData.getInstance().favourites.count == 0){
 			return nil
 		}
+		let item: SearchHistory
+		if indexPath.section == 0{
+			item = MapData.getInstance().favourites[indexPath.row]
+		} else {
+			item = MapData.getInstance().history[indexPath.row]
+		}
+		
+		let favourite = UIContextualAction(style: .destructive,
+										   title: "Favourite") { (action, view, completionHandler) in
+			
+			MapData.getInstance().toggleFavourites(item)
+			
+			tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
+			if indexPath.section != 0 {
+				tableView.reloadRows(at: [indexPath], with: .automatic)
+			}
+			
+			completionHandler(true)
+		}
+		favourite.image = UIImage(systemName: item.favourite ? "star.fill" : "star")
+		favourite.backgroundColor = .systemYellow
+		
 		let trash = UIContextualAction(style: .destructive,
 									   title: "Trash") { (action, view, completionHandler) in
-			let item: SearchHistory
 			if indexPath.section == 0{
-				item = MapData.getInstance().favourites[indexPath.row]
+				MapData.getInstance().removeFrom(favourites: item)
 			} else {
-				item = MapData.getInstance().history[indexPath.row]
+				MapData.getInstance().removeFrom(recents: item)
 			}
-			self.handleMoveToTrash(item, deleteRecord: indexPath.section == 0)
-			tableView.deleteRows(at: [indexPath], with: .automatic)
+			
+			self.searchViewDelegate?.deleteAnnotation(location: CLLocationCoordinate2D(latitude: item.latitude, longitude: item.longitude))
+			if indexPath.section == 0 && MapData.getInstance().favourites.count == 0 {
+				tableView.reloadSections(IndexSet(integer: 0), with: .automatic)
+			} else {
+				tableView.deleteRows(at: [indexPath], with: .automatic)
+			}
 			completionHandler(true)
 		}
 		trash.image = UIImage(systemName: "trash")
 		trash.backgroundColor = .systemRed
 		
-		let configuration = UISwipeActionsConfiguration(actions: [trash])
+		let configuration = UISwipeActionsConfiguration(actions: [trash, favourite])
 		
 		return configuration
 	}
@@ -216,7 +249,7 @@ extension SearchViewController: MKLocalSearchCompleterDelegate{
 protocol SearchViewDelegate {
 	func controllerDidChangeSelectedDetentIdentifier(_ selectedDetentIdentifier: UISheetPresentationController.Detent.Identifier?)
 	
-	func dropPin( at place: MKMapItem)
+	func dropPin( at place: Pin)
 	
 	func deleteAnnotation(location: CLLocationCoordinate2D)
 }

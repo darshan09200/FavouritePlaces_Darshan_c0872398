@@ -38,7 +38,7 @@ class MapData {
 	}
 	
 	func addToHistory(_ item: Pin){
-		let existingRecords = getRecords(from: history, title: item.title)
+		let existingRecords = getRecords(from: history, title: item.title, coordinate: item.coordinate)
 		if let record = existingRecords?.first{
 			record.setValue(Date.now, forKey: "searchedOn")
 		} else {
@@ -60,6 +60,7 @@ class MapData {
 		let existingRecords = getRecords(from: history, title: item.title!)
 		if let record = existingRecords?.first{
 			record.setValue(Date.now, forKey: "searchedOn")
+			record.setValue(true, forKey: "recents")
 		}
 		saveHistory()
 		loadHistory()
@@ -74,31 +75,39 @@ class MapData {
 			}
 			var didCoordMatch = true
 			if let coordinate = coordinate {
-				didCoordMatch = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude).distance(
-					from: CLLocation(latitude: item.latitude, longitude: item.longitude)
-				) < 10
+				didCoordMatch = coordinate.latitude == item.latitude
+				&& coordinate.longitude == item.longitude
 			}
 			return didTitleMatch && didCoordMatch
 		}
 	}
 	
-	func toggleFavourites(_ item: Pin) {
-		let existingRecords = getRecords(from: favourites, title: item.title, coordinate: item.coordinate)
+	func toggleFavourites(_ item: Pin, repeated: Bool = false) {
+		let existingRecords = getRecords(from: history + favourites, title: item.title, coordinate: item.coordinate)
 		if let record = existingRecords?.first{
-			record.setValue(Date.now, forKey: "searchedOn")
-			record.setValue(!record.favourite, forKey: "favourite")
-			saveHistory()
-			loadHistory()
+			toggleFavourites(record)
+		} else {
+			if !repeated{
+				addToHistory(item)
+				toggleFavourites(item, repeated: true)
+			}
 		}
 	}
 	
-	func removeFromRecents(_ item: SearchHistory, deleteRecord: Bool = false) {
-		if deleteRecord {
-			context.delete(item)
-		}else{
-			item.setValue(Date.now, forKey: "searchedOn")
-			item.setValue(!item.recents, forKey: "recents")
-		}
+	func toggleFavourites(_ item: SearchHistory) {
+		item.setValue(!item.favourite, forKey: "favourite")
+		saveHistory()
+		loadHistory()
+	}
+	
+	func removeFrom(recents item: SearchHistory) {
+		item.setValue(!item.recents, forKey: "recents")
+		saveHistory()
+		loadHistory()
+	}
+	
+	func removeFrom(favourites item: SearchHistory) {
+		item.setValue(!item.favourite, forKey: "favourite")
 		saveHistory()
 		loadHistory()
 	}

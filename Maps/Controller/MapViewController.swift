@@ -62,7 +62,7 @@ class MapViewController: UIViewController {
 	
 	lazy var detents: [UISheetPresentationController.Detent] = [ smallDetent(), mediumDetent(), .large()]
 	
-	var shouldDrawOverlay = true
+	var shouldDrawOverlay = false
 	
 	override func viewDidLoad() {
 		super.viewDidLoad()
@@ -104,6 +104,8 @@ class MapViewController: UIViewController {
 						 title: String,
 				 subtitle: String? = nil,
 				 secondarySubtitle: String? = nil) {
+		print(location)
+		
 		let annotationToAdd = Annotation()
 		annotationToAdd.coordinate = location
 		annotationToAdd.title = title
@@ -237,6 +239,7 @@ class MapViewController: UIViewController {
 
 extension MapViewController {
 	func addAnnotation(at coordinate: CLLocationCoordinate2D){
+		print(coordinate)
 		MapHelper.getInstance().getAddress(of: coordinate){ placemark in
 			let title = placemark?.name ?? self.generateAnnotationTitle()
 			self.dropPin(at: placemark?.location?.coordinate ?? coordinate, title: title, secondarySubtitle: placemark?.getAddress() ?? "")
@@ -404,39 +407,10 @@ extension MapViewController: MKMapViewDelegate{
 			annotationView!.canShowCallout = true
 			
 			let additionalBtn = AnnotationButton(type: .custom)
-			additionalBtn.showsMenuAsPrimaryAction = true
+			additionalBtn.annotation = annotation
 			additionalBtn.setImage(UIImage(systemName: "chevron.right"), for: .normal)
+			additionalBtn.addTarget(self, action: #selector(onExtraPress), for: .touchUpInside)
 			
-			let data = MapData.getInstance().getRecords(from: MapData.getInstance().favourites, title: annotation.title, coordinate: annotation.coordinate)
-			print(data)
-			var title = "Add to Favourite"
-			var imageName = "star"
-			if let item = data?.first, item.favourite {
-				title = "Remove from Favourite"
-				imageName = "star.fill"
-			}
-			
-			let favouriteAction = UIAction(title: title){
-				_ in self.onFavouritePress(annotation)
-			}
-			
-			favouriteAction.image = UIImage(systemName: imageName)
-			
-			let infoAction = UIAction(title: "Info"){
-				_ in self.onInfoPress(annotation)
-			}
-			infoAction.image = UIImage(systemName: "info.circle")
-			
-			let deleteAction = UIAction(title: "Delete", attributes: .destructive){
-				_ in self.onDeletePress(annotation)
-			}
-			deleteAction.image = UIImage(systemName: "trash")
-			
-			additionalBtn.menu = UIMenu(children: [
-				favouriteAction,
-				infoAction,
-				deleteAction
-			])
 			additionalBtn.sizeToFit()
 			
 			annotationView!.rightCalloutAccessoryView = additionalBtn
@@ -471,6 +445,45 @@ extension MapViewController: MKMapViewDelegate{
 		let camera = mapView.camera.copy() as! MKMapCamera
 		camera.centerCoordinateDistance *= delta
 		mapView.setCamera(camera, animated: true)
+	}
+	
+	@objc func onExtraPress(sender: AnnotationButton){
+		if let annotation = sender.annotation{
+			let data = MapData.getInstance().getRecords(from: MapData.getInstance().favourites, title: annotation.title, coordinate: annotation.coordinate)
+			var title = "Add to Favourite"
+			var imageName = "star"
+			if let item = data?.first, item.favourite {
+				title = "Remove from Favourite"
+				imageName = "star.fill"
+			}
+			
+			let favouriteAction = UIAlertAction(title: title, style: .default){
+				_ in self.onFavouritePress(annotation)
+			}
+			
+			favouriteAction.setValue(UIImage(systemName: imageName), forKey: "image")
+			
+			let infoAction = UIAlertAction(title: "Info", style: .default){
+				_ in self.onInfoPress(annotation)
+			}
+			infoAction.setValue(UIImage(systemName: "info.circle"), forKey: "image")
+			
+			let deleteAction = UIAlertAction(title: "Delete", style: .destructive){
+				_ in self.onDeletePress(annotation)
+			}
+			deleteAction.setValue(UIImage(systemName: "trash"), forKey: "image")
+			
+			let cancelAction = UIAlertAction(title: "Cancel", style: .cancel)
+			
+			let alert = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+			alert.addAction(favouriteAction)
+			alert.addAction(infoAction)
+			alert.addAction(deleteAction)
+			alert.addAction(cancelAction)
+			
+			searchVC.present(alert, animated: true)
+			
+		}
 	}
 	
 	func onInfoPress(_ annotation: Annotation){
@@ -560,16 +573,16 @@ extension MapViewController: SearchViewDelegate{
 		}
 	}
 	
-	func dropPin(at place: MKMapItem) {
+	func dropPin(at pin: Pin) {
 		
 		searchVC.sheetPresentationController?.animateChanges {
 			searchVC.sheetPresentationController?.selectedDetentIdentifier = mediumDetentId
 			controllerDidChangeSelectedDetentIdentifier(mediumDetentId)
 		}
-		let placemark = place.placemark
 		dropPin(
-			at: placemark.coordinate,
-			title: placemark.name ?? generateAnnotationTitle()
+			at: pin.coordinate!,
+			title: pin.title,
+			secondarySubtitle: pin.subtitle
 		)
 	}
 	
