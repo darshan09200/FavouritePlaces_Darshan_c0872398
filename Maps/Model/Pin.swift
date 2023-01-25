@@ -6,8 +6,10 @@
 //
 
 import Foundation
+import MapKit
 
 struct Pin {
 	var title: String
 	var subtitle: String
+	var coordinate: CLLocationCoordinate2D?
 }

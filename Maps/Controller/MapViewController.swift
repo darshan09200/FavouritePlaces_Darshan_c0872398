@@ -102,11 +102,13 @@ class MapViewController: UIViewController {
 	
 	func dropPin(at location: CLLocationCoordinate2D,
 						 title: String,
-				 subtitle: String? = nil) {
+				 subtitle: String? = nil,
+				 secondarySubtitle: String? = nil) {
 		let annotationToAdd = Annotation()
 		annotationToAdd.coordinate = location
 		annotationToAdd.title = title
-		annotationToAdd.subtitle = subtitle ?? generateAnnotationTitle()
+		annotationToAdd.subtitle = subtitle
+		annotationToAdd.secondarySubtitle = secondarySubtitle
 		if let index = annotations.firstIndex(where: {
 			CLLocation(latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude).distance(
 				from: CLLocation(latitude: location.latitude, longitude: location.longitude)
@@ -237,9 +239,9 @@ extension MapViewController {
 	func addAnnotation(at coordinate: CLLocationCoordinate2D){
 		MapHelper.getInstance().getAddress(of: coordinate){ placemark in
 			let title = placemark?.name ?? self.generateAnnotationTitle()
-			self.dropPin(at: placemark?.location?.coordinate ?? coordinate, title: title)
+			self.dropPin(at: placemark?.location?.coordinate ?? coordinate, title: title, secondarySubtitle: placemark?.getAddress() ?? "")
 			
-			MapData.getInstance().addToHistory(Pin(title: title, subtitle: placemark?.getAddress() ?? ""))
+			MapData.getInstance().addToHistory(Pin(title: title, subtitle: placemark?.getAddress() ?? "", coordinate: placemark?.location?.coordinate ?? coordinate))
 			self.searchVC.searchResultsTable.reloadData()
 		}
 	}
@@ -401,19 +403,43 @@ extension MapViewController: MKMapViewDelegate{
 			}
 			annotationView!.canShowCallout = true
 			
-			let deleteBtn = AnnotationButton(type: .custom)
-			deleteBtn.tintColor = .systemRed
-			deleteBtn.annotation = annotation
-			deleteBtn.setImage(UIImage(systemName: "trash"), for: .normal)
-			deleteBtn.sizeToFit()
-			deleteBtn.addTarget(self, action: #selector(onDeletePress), for: .touchUpInside)
-
-			annotationView!.rightCalloutAccessoryView = deleteBtn
+			let additionalBtn = AnnotationButton(type: .custom)
+			additionalBtn.showsMenuAsPrimaryAction = true
+			additionalBtn.setImage(UIImage(systemName: "chevron.right"), for: .normal)
 			
-			let infoBtn = AnnotationButton(type: .detailDisclosure)
-			infoBtn.annotation = annotation
-			infoBtn.addTarget(self, action: #selector(onInfoPress), for: .touchUpInside)
-			annotationView!.leftCalloutAccessoryView = infoBtn
+			let data = MapData.getInstance().getRecords(from: MapData.getInstance().favourites, title: annotation.title, coordinate: annotation.coordinate)
+			print(data)
+			var title = "Add to Favourite"
+			var imageName = "star"
+			if let item = data?.first, item.favourite {
+				title = "Remove from Favourite"
+				imageName = "star.fill"
+			}
+			
+			let favouriteAction = UIAction(title: title){
+				_ in self.onFavouritePress(annotation)
+			}
+			
+			favouriteAction.image = UIImage(systemName: imageName)
+			
+			let infoAction = UIAction(title: "Info"){
+				_ in self.onInfoPress(annotation)
+			}
+			infoAction.image = UIImage(systemName: "info.circle")
+			
+			let deleteAction = UIAction(title: "Delete", attributes: .destructive){
+				_ in self.onDeletePress(annotation)
+			}
+			deleteAction.image = UIImage(systemName: "trash")
+			
+			additionalBtn.menu = UIMenu(children: [
+				favouriteAction,
+				infoAction,
+				deleteAction
+			])
+			additionalBtn.sizeToFit()
+			
+			annotationView!.rightCalloutAccessoryView = additionalBtn
 			
 			return annotationView
 		}
@@ -425,6 +451,7 @@ extension MapViewController: MKMapViewDelegate{
 			removeAllDistanceLabel()
 			removeOverlay("polygon")
 			removeOverlay("route")
+			mapView.deselectAnnotation(view.annotation!, animated: true)
 		}
 		view.setDragState(newState, animated: true)
 		if newState == .ending, let annotation = view.annotation as? Annotation{
@@ -446,26 +473,21 @@ extension MapViewController: MKMapViewDelegate{
 		mapView.setCamera(camera, animated: true)
 	}
 	
-	@objc func onDeletePress(sender: AnnotationButton){
-		print("called delete")
-	}
-	
-	@objc func onInfoPress(sender: AnnotationButton){
+	func onInfoPress(_ annotation: Annotation){
 		if let userLocation = currentLocation {
-			if let annotation = sender.annotation{
-				MapHelper.getInstance().getRoute(from: userLocation, to: annotation.coordinate){
-					mapRoute in
-					let distance = String(format: "%.2f", mapRoute.route.distance / 1000)
-					let ac = UIAlertController(
-						title: "Location: \(annotation.title! )",
-						message: "Distance from your current location is \(distance) kms",
-						preferredStyle: .alert
-					)
-					ac.addAction(UIAlertAction(title: "OK", style: .default))
-					self.searchVC.present(ac, animated: true)
-				}
-				return
+			MapHelper.getInstance().getRoute(from: userLocation, to: annotation.coordinate){
+				mapRoute in
+				let distance = String(format: "%.2f", mapRoute.route.distance / 1000)
+				let ac = UIAlertController(
+					title: "Location: \(annotation.title! )",
+					message: "Distance from your current location is \(distance) kms",
+					preferredStyle: .alert
+				)
+				ac.addAction(UIAlertAction(title: "OK", style: .default))
+				self.searchVC.present(ac, animated: true)
 			}
+			return
+			
 		}
 
 		let ac = UIAlertController(
@@ -476,6 +498,19 @@ extension MapViewController: MKMapViewDelegate{
 		ac.addAction(UIAlertAction(title: "OK", style: .default))
 		self.searchVC.present(ac, animated: true)
 	}
+	
+	func onFavouritePress(_ annotation: Annotation){
+		MapData.getInstance().toggleFavourites(Pin(title: annotation.title!,
+												  subtitle: annotation.secondarySubtitle!,
+												  coordinate: annotation.coordinate))
+		
+		self.searchVC.searchResultsTable.reloadData()
+	}
+	
+	func onDeletePress(_ annotation: Annotation){
+		removeAnnotation(annotation)
+	}
+	
 }
 
 extension MapViewController: CLLocationManagerDelegate{
@@ -536,6 +571,15 @@ extension MapViewController: SearchViewDelegate{
 			at: placemark.coordinate,
 			title: placemark.name ?? generateAnnotationTitle()
 		)
+	}
+	
+	func deleteAnnotation(location: CLLocationCoordinate2D){
+		if let index = annotations.firstIndex(where: {
+			$0.coordinate.latitude ==  location.latitude && $0.coordinate.longitude == location.longitude
+		}){
+			mapView.removeAnnotation(annotations[index])
+			annotations.remove(at: index)
+		}
 	}
 	
 }
