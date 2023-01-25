@@ -62,6 +62,8 @@ class MapViewController: UIViewController {
 	
 	lazy var detents: [UISheetPresentationController.Detent] = [ smallDetent(), mediumDetent(), .large()]
 	
+	var shouldDrawOverlay = true
+	
 	override func viewDidLoad() {
 		super.viewDidLoad()
 		// Do any additional setup after loading the view.
@@ -100,18 +102,18 @@ class MapViewController: UIViewController {
 	
 	func dropPin(at location: CLLocationCoordinate2D,
 						 title: String,
-						 subtitle: String? = nil) {
+				 subtitle: String? = nil) {
 		let annotationToAdd = Annotation()
-		annotationToAdd.title = title
-		annotationToAdd.subtitle = subtitle
 		annotationToAdd.coordinate = location
-		
+		annotationToAdd.title = title
+		annotationToAdd.subtitle = subtitle ?? generateAnnotationTitle()
 		if let index = annotations.firstIndex(where: {
-			$0.coordinate.latitude == annotationToAdd.coordinate.latitude
-			&& $0.coordinate.longitude == annotationToAdd.coordinate.longitude
+			CLLocation(latitude: $0.coordinate.latitude, longitude: $0.coordinate.longitude).distance(
+				from: CLLocation(latitude: location.latitude, longitude: location.longitude)
+			) < 100
 		}){
+			mapView.removeAnnotation(annotations[index])
 			annotations.remove(at: index)
-			mapView.removeAnnotation(annotationToAdd)
 		}
 		mapView.addAnnotation(annotationToAdd)
 		
@@ -123,7 +125,7 @@ class MapViewController: UIViewController {
 		
 		mapView.setCamera(camera, animated: true)
 		
-		onAnnotationsUpdated()
+		redrawOverlay()
 	}
 	
 	func generateAnnotationTitle(for index: Int? = nil) -> String{
@@ -136,15 +138,11 @@ class MapViewController: UIViewController {
 	
 	@objc func onMapLongTap(_ sender: UILongPressGestureRecognizer){
 		if sender.state == .ended {
-			let point = sender.location(in: mapView)
-			let coordinate = mapView.convert(point, toCoordinateFrom: mapView)
-			
-			MapHelper.getInstance().getAddress(of: coordinate){ placemark in
-				let title = placemark?.name ?? self.generateAnnotationTitle()
-				self.dropPin(at: placemark?.location?.coordinate ?? coordinate, title: title)
-
-				MapData.getInstance().addToHistory(Pin(title: title, subtitle: placemark?.getAddress() ?? ""))
-				self.searchVC.searchResultsTable.reloadData()
+			if mapView.selectedAnnotations.count == 0{
+				let point = sender.location(in: mapView)
+				let coordinate = mapView.convert(point, toCoordinateFrom: mapView)
+				
+				addAnnotation(at: coordinate)
 			}
 		}
 	}
@@ -208,7 +206,7 @@ class MapViewController: UIViewController {
 			}
 		}
 		
-		onAnnotationsUpdated()
+		redrawOverlay()
 	}
 	
 	@IBAction func onShowRoutePress() {
@@ -235,84 +233,83 @@ class MapViewController: UIViewController {
 	
 }
 
-extension MapViewController{
+extension MapViewController {
+	func addAnnotation(at coordinate: CLLocationCoordinate2D){
+		MapHelper.getInstance().getAddress(of: coordinate){ placemark in
+			let title = placemark?.name ?? self.generateAnnotationTitle()
+			self.dropPin(at: placemark?.location?.coordinate ?? coordinate, title: title)
+			
+			MapData.getInstance().addToHistory(Pin(title: title, subtitle: placemark?.getAddress() ?? ""))
+			self.searchVC.searchResultsTable.reloadData()
+		}
+	}
 	
-	func onAnnotationsUpdated(){
-		removeOverlay("overlay")
+	func redrawOverlay(){
+		removeOverlay("polygon")
 		removeOverlay("route")
-		
-		var points = [MKMapPoint]()
-		
-		self.annotations.forEach{ annotation in
-			if annotation.type == .pin {
-				points.append(MKMapPoint(annotation.coordinate))
+		removeAllDistanceLabel()
+		if shouldDrawOverlay{
+			var points = [MKMapPoint]()
+			
+			self.annotations.forEach{ annotation in
+				if annotation.type == .pin {
+					points.append(MKMapPoint(annotation.coordinate))
+				}
+			}
+			var coordinates = annotations.map { $0.coordinate }
+			if coordinates.count < 2 {
+				self.showRoutesBtn.isHidden = true
+				MapData.getInstance().setRoutes([])
+				if self.searchVC.presentedViewController != nil{
+					self.stepsVC.onDonePress()
+				}
+				return
+			}
+			if coordinates.count > 2 {
+				coordinates.append(coordinates.first!)
+			}
+			
+			if mapType == .layer{
+				showRoutesBtn.isHidden = true
+				if coordinates.count > 2 {
+					let polygon = MKPolygon(points: &points, count: points.count)
+					polygon.title = "polygon"
+					mapView.addOverlay(polygon)
+					mapView.setVisibleMapRect(polygon.boundingMapRect, edgePadding: mapPadding, animated: true)
+					MapHelper.getInstance().getBatchRoutes(from: coordinates){mapRoutes in
+						mapRoutes.forEach{
+							mapRoute in
+							let route = mapRoute.route
+							let centerLat = (mapRoute.source.latitude + mapRoute.destination.latitude) / 2
+							let centerLong = (mapRoute.source.longitude + mapRoute.destination.longitude) / 2
+							self.addDistanceLabel(for: route, at: CLLocationCoordinate2D(latitude: centerLat, longitude: centerLong))
+							
+						}
+					}
+				}
 			} else {
-				removeAnnotation(annotation)
-			}
-		}
-		var coordinates = annotations.map { $0.coordinate }
-		if coordinates.count < 2 {
-			self.showRoutesBtn.isHidden = true
-			MapData.getInstance().setRoutes([])
-			if self.searchVC.presentedViewController != nil{
-				self.stepsVC.onDonePress()
-			}
-			return
-		}
-		if coordinates.count > 2 {
-			coordinates.append(coordinates.first!)
-		}
-		
-		if mapType == .layer{
-			showRoutesBtn.isHidden = true
-			if points.count == 3 {
-				let polygon = MKPolygon(points: &points, count: points.count)
-				polygon.title = "overlay"
-				mapView.addOverlay(polygon)
-				mapView.setVisibleMapRect(polygon.boundingMapRect, edgePadding: mapPadding, animated: true)
 				MapHelper.getInstance().getBatchRoutes(from: coordinates){mapRoutes in
 					mapRoutes.forEach{
 						mapRoute in
 						let route = mapRoute.route
-						let centerLat = (mapRoute.source.latitude + mapRoute.destination.latitude) / 2
-						let centerLong = (mapRoute.source.longitude + mapRoute.destination.longitude) / 2
-						self.addDistanceLabel(for: route, at: CLLocationCoordinate2D(latitude: centerLat, longitude: centerLong))
 						
+						route.polyline.title = "route"
+						self.mapView.addOverlay(route.polyline)
+						self.addDistanceLabel(for: route)
 					}
-				}
-			} else if points.count > 3 {
-				let lastAdded = annotations.last(where: {$0.type == .pin}) ?? Annotation()
-				annotations.forEach{ annotation in
-					self.mapView.removeAnnotation(annotation)
-					if annotation == lastAdded {
-						annotation.title = generateAnnotationTitle(for: 0)
-						self.mapView.addAnnotation(annotation)
-						self.annotations = [annotation]
-					}
-				}
-			}
-		} else {
-			MapHelper.getInstance().getBatchRoutes(from: coordinates){mapRoutes in
-				mapRoutes.forEach{
-					mapRoute in
-					let route = mapRoute.route
 					
-					route.polyline.title = "route"
-					self.mapView.addOverlay(route.polyline)
-					self.addDistanceLabel(for: route)
-				}
-				
-				MapData.getInstance().setRoutes(mapRoutes)
-				self.mapView.setVisibleMapRect(mapRoutes.last!.route.polyline.boundingMapRect,
-											   edgePadding: self.mapPadding, animated: true)
-				if mapRoutes.count > 0 {
-					self.showRoutesBtn.isHidden = false
-				}
-				if self.searchVC.presentedViewController != nil{
-					if mapRoutes.count > 0{
-						self.stepsVC.reloadData()
-					}else{
-						self.stepsVC.onDonePress()
+					MapData.getInstance().setRoutes(mapRoutes)
+					self.mapView.setVisibleMapRect(mapRoutes.last!.route.polyline.boundingMapRect,
+												   edgePadding: self.mapPadding, animated: true)
+					if mapRoutes.count > 0 {
+						self.showRoutesBtn.isHidden = false
+					}
+					if self.searchVC.presentedViewController != nil{
+						if mapRoutes.count > 0{
+							self.stepsVC.reloadData()
+						}else{
+							self.stepsVC.onDonePress()
+						}
 					}
 				}
 			}
@@ -347,6 +344,14 @@ extension MapViewController{
 		self.mapView.addAnnotation(distanceLabel)
 		self.annotations.append(distanceLabel)
 	}
+	
+	func removeAllDistanceLabel(){
+		self.annotations.forEach{ annotation in
+			if annotation.type == .label {
+				removeAnnotation(annotation)
+			}
+		}
+	}
 }
 
 extension MapViewController: MKMapViewDelegate{
@@ -380,35 +385,79 @@ extension MapViewController: MKMapViewDelegate{
 				}
 				return annotationView
 			}
-			var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "Pin")
+			var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: "Pin") as? MKMarkerAnnotationView
 			
 			if annotationView == nil {
 				annotationView = MKMarkerAnnotationView(annotation: annotation, reuseIdentifier: "Pin")
 			} else {
 				annotationView?.annotation = annotation
 			}
-			if mapType == .layer{
-				annotationView!.canShowCallout = true
-				let btn = UIButton(type: .detailDisclosure)
-				annotationView!.rightCalloutAccessoryView = btn
-			} else {
-				annotationView!.canShowCallout = false
-				annotationView!.rightCalloutAccessoryView = nil
+			
+			annotationView?.displayPriority = .defaultHigh
+			annotationView!.isDraggable = true
+			if annotation.subtitle != nil{
+				annotationView!.titleVisibility = .visible
+				annotationView!.subtitleVisibility = .visible
 			}
+			annotationView!.canShowCallout = true
+			
+			let deleteBtn = AnnotationButton(type: .custom)
+			deleteBtn.tintColor = .systemRed
+			deleteBtn.annotation = annotation
+			deleteBtn.setImage(UIImage(systemName: "trash"), for: .normal)
+			deleteBtn.sizeToFit()
+			deleteBtn.addTarget(self, action: #selector(onDeletePress), for: .touchUpInside)
+
+			annotationView!.rightCalloutAccessoryView = deleteBtn
+			
+			let infoBtn = AnnotationButton(type: .detailDisclosure)
+			infoBtn.annotation = annotation
+			infoBtn.addTarget(self, action: #selector(onInfoPress), for: .touchUpInside)
+			annotationView!.leftCalloutAccessoryView = infoBtn
+			
 			return annotationView
 		}
 		return nil
 	}
 	
+	func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, didChange newState: MKAnnotationView.DragState, fromOldState oldState: MKAnnotationView.DragState) {
+		if newState == .starting{
+			removeAllDistanceLabel()
+			removeOverlay("polygon")
+			removeOverlay("route")
+		}
+		view.setDragState(newState, animated: true)
+		if newState == .ending, let annotation = view.annotation as? Annotation{
+			let coordinate = annotation.coordinate
+			addAnnotation(at: coordinate)
+		}
+	}
 	
-	func mapView(_ mapView: MKMapView, annotationView view: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+	func mapView(_ mapView: MKMapView, didSelect annotation: MKAnnotation) {
+		if mapType == .route, let annotation = annotation as? Annotation, annotation.type == .pin {
+			removeAnnotation(annotation)
+			redrawOverlay()
+		}
+	}
+	
+	func zoomMap(byFactor delta: Double) {
+		let camera = mapView.camera.copy() as! MKMapCamera
+		camera.centerCoordinateDistance *= delta
+		mapView.setCamera(camera, animated: true)
+	}
+	
+	@objc func onDeletePress(sender: AnnotationButton){
+		print("called delete")
+	}
+	
+	@objc func onInfoPress(sender: AnnotationButton){
 		if let userLocation = currentLocation {
-			if let annotation = view.annotation{
+			if let annotation = sender.annotation{
 				MapHelper.getInstance().getRoute(from: userLocation, to: annotation.coordinate){
 					mapRoute in
 					let distance = String(format: "%.2f", mapRoute.route.distance / 1000)
 					let ac = UIAlertController(
-						title: "Location: \(annotation.title! ?? "")",
+						title: "Location: \(annotation.title! )",
 						message: "Distance from your current location is \(distance) kms",
 						preferredStyle: .alert
 					)
@@ -418,7 +467,7 @@ extension MapViewController: MKMapViewDelegate{
 				return
 			}
 		}
-	
+
 		let ac = UIAlertController(
 			title: "Warning",
 			message: "User Location not found",
@@ -427,21 +476,7 @@ extension MapViewController: MKMapViewDelegate{
 		ac.addAction(UIAlertAction(title: "OK", style: .default))
 		self.searchVC.present(ac, animated: true)
 	}
-	
-	func mapView(_ mapView: MKMapView, didSelect annotation: MKAnnotation) {
-		if mapType == .route, let annotation = annotation as? Annotation, annotation.type == .pin {
-			removeAnnotation(annotation)
-			onAnnotationsUpdated()
-		}
-	}
-	
-	func zoomMap(byFactor delta: Double) {
-		let camera = mapView.camera.copy() as! MKMapCamera
-		camera.centerCoordinateDistance *= delta
-		mapView.setCamera(camera, animated: true)
-	}
 }
-
 
 extension MapViewController: CLLocationManagerDelegate{
 	func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
@@ -457,8 +492,6 @@ extension MapViewController: CLLocationManagerDelegate{
 	}
 	
 }
-
-
 
 extension MapViewController: SearchViewDelegate{
 	

@@ -15,4 +15,9 @@ enum AnnotationType{
 
 class Annotation: MKPointAnnotation {
 	var type: AnnotationType = .pin
+	override var coordinate: CLLocationCoordinate2D{
+		willSet{
+			title = ""
+		}
+	}
 }
